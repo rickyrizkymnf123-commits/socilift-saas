@@ -187,3 +187,31 @@
       - Typecheck `npx tsc --noEmit` lolos 0 errors dan build Next.js sukses.
       - Commit & push ke GitHub `rickyrizkymnf123-commits/socilift-saas` (branch `main`).
       - Otomatis terdeploy ke Vercel dan aktif di domain live `https://socilift-saas.vercel.app`.
+
+27. **Implementasi "Fitur Intip" (User Impersonation / View-as-User Mode) (19 Sep 2026)**:
+    - **Tujuan**: Memungkinkan Super Admin untuk "mengintip" dan mengalami langsung antarmuka, hak akses menu, dan fitur aplikasi persis seperti yang dilihat oleh pengguna/role tertentu (Creator Pro, Manager, Free Trial, Expired).
+    - **Arsitektur Auth Context (`src/lib/auth/auth-context.tsx`)**:
+      - Ditambahkan state `impersonatedUser`, boolean flag `isImpersonating`, method `startImpersonation(user)`, dan `stopImpersonation()`.
+      - Persistensi status intip pada `localStorage` (`socilift:impersonated_user`).
+      - `user` getter mengembalikan `impersonatedUser` saat mode intip aktif, sehingga seluruh logika UI dan navigasi beradaptasi otomatis.
+    - **Floating Sticky Amber Alert Banner (`src/app/(app)/layout.tsx`)**:
+      - Tampil di puncak layar dengan animasi berdenyut amber saat mode intip aktif.
+      - Menampilkan informasi akun yang sedang diintip: Display Name/Email, Badge Role, dan Badge Status/Tier Paket.
+      - Tombol cepat **`[✕ Keluar dari Mode Intip]`** untuk mengembalikan sesi ke Super Admin seketika.
+    - **Pusat Kontrol Intip di Admin (`src/app/(app)/admin/users/page.tsx`)**:
+      - **Preset Bar Cepat**: 4 tombol akses instan di bagian atas tabel pengguna (Creator Pro, Manager, Free Trial, Expired Account).
+      - **Aksi Baris Tabel**: Tombol ikon mata **`[Intip]`** pada setiap baris user untuk mengintip akun spesifik pengguna tersebut.
+
+28. **Redesain Total Identitas Brand: Typography Wordmark Mewah & Modern (19 Sep 2026)**:
+    - **Tujuan**: Menghilangkan ikon kotak yang kaku/kurang menarik dan beralih ke tipografi brand mark murni bergaya modern, elegan, dan mewah (*luxury minimalism*).
+    - **Komponen `SociliftLogo` (`src/components/ui/socilift-logo.tsx`)**:
+      - Tipografi `Socilift` dengan tracking rapat presisi, gradasi warna Slate-900 ke Slate-700 (Light) dan White ke Slate-200 (Dark).
+      - Aksen titik bercahaya (*radiant cyan accent dot*) di atas huruf `i`.
+      - Badge minimalis `PLUS` dalam kapsul (*pill badge*) bergradasi Indigo-Cyan dengan glow halus.
+    - **Integrasi Penuh**:
+      - Sidebar (`src/components/layout/sidebar.tsx`), Auth Login & Signup (`src/app/(auth)/login/page.tsx`, `src/app/(auth)/signup/page.tsx`), dan Landing Splash (`src/app/page.tsx`).
+    - **Verifikasi & Sinkronisasi Produksi**:
+      - TypeScript compiler `npx tsc --noEmit` lolos 0 errors.
+      - Next.js production build (`npm run build`) sukses tanpa peringatan.
+      - Terdeploy dan live di `https://socilift-saas.vercel.app`.
+
