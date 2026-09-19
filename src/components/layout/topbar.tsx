@@ -3,14 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth/auth-context';
 import { useTheme } from '@/lib/theme-context';
-import { Bell, Plus, Sun, Moon } from 'lucide-react';
+import { Bell, Plus, Sun, Moon, Eye, Smartphone } from 'lucide-react';
 import NotificationModal from './notification-modal';
 
 export default function Topbar({ onOpenNewContent }: { onOpenNewContent?: () => void }) {
-  const { currentBrand, user } = useAuth();
+  const { currentBrand, user, originalRole, isImpersonating, setIsInspectorOpen, deviceMode } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [unreadCount, setUnreadCount] = useState(1);
   const [notifOpen, setNotifOpen] = useState(false);
+
+  const canInspect = originalRole === 'dashboard_admin' || user?.email === 'rickyrizkymnf123@gmail.com' || isImpersonating;
 
   useEffect(() => {
     fetch(`/api/notifications?userId=${user?.id || ''}`)
@@ -41,7 +43,27 @@ export default function Topbar({ onOpenNewContent }: { onOpenNewContent?: () => 
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          {/* Intip Tampilan Users & Device Simulator Button */}
+          {canInspect && (
+            <button
+              onClick={() => setIsInspectorOpen(true)}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-black flex items-center gap-1.5 transition cursor-pointer ${
+                isImpersonating || deviceMode !== 'desktop'
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm animate-pulse'
+                  : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50 hover:bg-amber-100 dark:hover:bg-amber-900/60'
+              }`}
+              title="Pusat Simulasi & Intip Tampilan Pengguna"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Intip Tampilan</span>
+              {deviceMode !== 'desktop' && (
+                <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-slate-950 text-white font-mono uppercase">
+                  {deviceMode}
+                </span>
+              )}
+            </button>
+          )}
           {/* Theme Toggle Button (Light / Dark) */}
           <button
             onClick={toggleTheme}

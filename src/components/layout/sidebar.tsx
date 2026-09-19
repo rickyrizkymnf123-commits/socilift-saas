@@ -26,15 +26,30 @@ import {
   Crown,
   Sun,
   Moon,
+  Eye,
 } from 'lucide-react';
 import SociliftLogo from '@/components/ui/socilift-logo';
 
 export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () => void }) {
   const pathname = usePathname();
-  const { user, currentOrg, currentBrand, brands, role, switchBrand, switchRole, logout } = useAuth();
+  const {
+    user,
+    currentOrg,
+    currentBrand,
+    brands,
+    role,
+    originalRole,
+    isImpersonating,
+    setIsInspectorOpen,
+    switchBrand,
+    switchRole,
+    logout
+  } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+
+  const canInspect = originalRole === 'dashboard_admin' || user?.email === 'rickyrizkymnf123@gmail.com' || isImpersonating;
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -135,6 +150,19 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
 
       {/* User Profile & Role Switcher */}
       <div className="p-3 border-t border-slate-800 bg-slate-950/60 relative">
+        {canInspect && (
+          <button
+            onClick={() => setIsInspectorOpen(true)}
+            className={`w-full mb-2 flex items-center justify-center gap-2 py-1.5 px-3 rounded-xl border text-xs font-black transition cursor-pointer ${
+              isImpersonating
+                ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm animate-pulse'
+                : 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-400 hover:text-amber-300'
+            }`}
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Mode Intip Pengguna</span>
+          </button>
+        )}
         <div className="flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-slate-800/40 transition">
           <div className="flex items-center gap-2.5 truncate">
             <div className="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">

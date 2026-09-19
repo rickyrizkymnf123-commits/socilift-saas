@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Profile, Organization, Brand, OrgRole } from '@/types/database';
 import { useRouter } from 'next/navigation';
 
+export type DeviceMode = 'desktop' | 'laptop' | 'tablet' | 'mobile';
+
 export interface ImpersonatedUser {
   id: string;
   email: string;
@@ -15,15 +17,21 @@ export interface ImpersonatedUser {
 
 interface AuthContextType {
   user: Profile | null;
+  originalUser: Profile | null;
   currentOrg: Organization | null;
   currentBrand: Brand | null;
   brands: Brand[];
   role: OrgRole;
+  originalRole: OrgRole;
   isLoading: boolean;
   canEdit: boolean;
   canApprove: boolean;
   impersonatedUser: ImpersonatedUser | null;
   isImpersonating: boolean;
+  deviceMode: DeviceMode;
+  setDeviceMode: (mode: DeviceMode) => void;
+  isInspectorOpen: boolean;
+  setIsInspectorOpen: (open: boolean) => void;
   startImpersonation: (user: ImpersonatedUser) => void;
   stopImpersonation: () => void;
   switchBrand: (brandId: string) => void;
@@ -44,6 +52,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<OrgRole>('dashboard_admin');
   const [originalRole, setOriginalRole] = useState<OrgRole>('dashboard_admin');
   const [impersonatedUser, setImpersonatedUser] = useState<ImpersonatedUser | null>(null);
+  const [deviceMode, setDeviceMode] = useState<DeviceMode>('desktop');
+  const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchInitialData = async () => {
@@ -170,15 +180,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        originalUser: user,
         currentOrg,
         currentBrand,
         brands,
         role,
+        originalRole,
         isLoading,
         canEdit,
         canApprove,
         impersonatedUser,
         isImpersonating: impersonatedUser !== null,
+        deviceMode,
+        setDeviceMode,
+        isInspectorOpen,
+        setIsInspectorOpen,
         startImpersonation,
         stopImpersonation,
         switchBrand,
