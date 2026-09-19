@@ -4,7 +4,7 @@ export type ContentStatus = 'ideation' | 'scripting' | 'take_konten' | 'editing'
 export type AIJobStatus = 'queued' | 'uploading' | 'file_processing' | 'extracting' | 'validating' | 'ready_to_review' | 'imported' | 'failed';
 export type NotificationType = 'info' | 'warning' | 'maintenance' | 'feature_update' | 'critical';
 
-export type SubscriptionTier = 'free' | 'starter' | 'pro' | 'agency' | 'enterprise';
+export type SubscriptionTier = 'basic' | 'pro';
 export type SubscriptionStatus = 'active' | 'expired' | 'trial' | 'cancelled';
 
 export interface UserSubscription {

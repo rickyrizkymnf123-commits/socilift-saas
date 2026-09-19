@@ -63,22 +63,22 @@ export default function UserInspectorModal({ isOpen, onClose }: UserInspectorMod
     },
     {
       id: 'preset_manager',
-      name: 'Siti Manager (Enterprise)',
+      name: 'Siti Manager (Pro Lead)',
       email: 'manager@socilift.local',
       role: 'manager',
-      tier: 'enterprise',
+      tier: 'pro',
       status: 'active',
       desc: 'Tampilan manajer: Akses persetujuan (approval) naskah, analitik lanjutan & laporan pivot.',
       badgeColor: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30'
     },
     {
       id: 'preset_trial',
-      name: 'User Trial Baru (Starter)',
+      name: 'User Trial Baru (Basic)',
       email: 'trial.user@socilift.local',
       role: 'creator',
-      tier: 'starter',
+      tier: 'basic',
       status: 'trial',
-      desc: 'Tampilan pengguna baru dalam masa percobaan 14 hari dengan kuota terbatas.',
+      desc: 'Tampilan pengguna baru dalam masa percobaan dengan kuota basic.',
       badgeColor: 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30'
     },
     {
@@ -86,7 +86,7 @@ export default function UserInspectorModal({ isOpen, onClose }: UserInspectorMod
       name: 'Akun Kedaluwarsa (Expired)',
       email: 'expired.account@socilift.local',
       role: 'creator',
-      tier: 'starter',
+      tier: 'basic',
       status: 'expired',
       desc: 'Tampilan akun yang masa langganannya telah habis untuk menguji flow perpanjangan/paywall.',
       badgeColor: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30'
@@ -96,7 +96,7 @@ export default function UserInspectorModal({ isOpen, onClose }: UserInspectorMod
       name: 'Klien Reviewer (View-Only)',
       email: 'client.viewer@socilift.local',
       role: 'view_only',
-      tier: 'starter',
+      tier: 'basic',
       status: 'active',
       desc: 'Tampilan klien atau peninjau tanpa akses membuat konten atau menyunting data.',
       badgeColor: 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30'

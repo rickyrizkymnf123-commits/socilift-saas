@@ -10,23 +10,61 @@ export async function POST(req: Request) {
     }
 
     let user = dbStore.getProfileByEmail(email);
+    const nowIso = new Date().toISOString();
+    const isAdminUser = email.toLowerCase() === 'rickyrizkymnf123@gmail.com';
+
     if (!user) {
-      // Auto register for local dev testing if not exists
+      // Auto register with dedicated isolated workspace
+      const newUserId = 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
       user = dbStore.createProfile({
-        id: 'u-' + Date.now(),
-        email,
+        id: newUserId,
+        email: email.toLowerCase(),
         display_name: email.split('@')[0],
-        created_at: new Date().toISOString(),
+        created_at: nowIso,
       });
-      const org = dbStore.getOrganizations()[0];
-      if (org) {
-        dbStore.addMember({
-          org_id: org.id,
-          user_id: user.id,
-          role: 'creator',
-          created_at: new Date().toISOString(),
-        });
-      }
+
+      const userOrg = {
+        id: 'org-' + user.id,
+        name: `${user.display_name || email.split('@')[0]}'s Workspace`,
+        owner_id: user.id,
+        created_at: nowIso,
+      };
+      dbStore.createOrganization(userOrg);
+
+      dbStore.addMember({
+        org_id: userOrg.id,
+        user_id: user.id,
+        role: isAdminUser ? 'dashboard_admin' : 'creator',
+        created_at: nowIso,
+      });
+
+      // Dedicated isolated brand for this user
+      dbStore.createBrand({
+        id: 'brand-' + user.id,
+        org_id: userOrg.id,
+        name: `${user.display_name || email.split('@')[0]} Studio`,
+        color: '#3B82F6',
+        pillars: ['Edukasi & Tips', 'Inspirasi', 'Promosi Produk'],
+        funnels: ['TOFU (Top of Funnel)', 'MOFU (Middle of Funnel)', 'BOFU (Bottom of Funnel)'],
+        objectives: ['Brand Awareness', 'Engagement', 'Sales'],
+        details: {
+          niche: 'Kreator Konten',
+          toneOfVoice: 'Casual & Menarik',
+          targetAudience: 'Audiens Media Sosial',
+        },
+        created_by: user.id,
+        created_at: nowIso,
+      });
+
+      // Default subscription
+      dbStore.saveUserSubscription(user.id, {
+        tier: isAdminUser ? 'pro' : 'basic',
+        status: 'active',
+        is_free_access: isAdminUser,
+        start_date: nowIso,
+        end_date: new Date(Date.now() + 30 * 86400000).toISOString(),
+        notes: isAdminUser ? 'Super Admin' : 'Free Basic User',
+      });
     }
 
     const cookieStore = await cookies();

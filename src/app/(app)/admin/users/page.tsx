@@ -332,21 +332,13 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Tier Colors
-  const getTierBadge = (tier?: SubscriptionTier) => {
-    switch (tier) {
-      case 'enterprise':
-        return 'bg-purple-500/15 text-purple-600 dark:text-purple-300 border-purple-500/30';
-      case 'agency':
-        return 'bg-pink-500/15 text-pink-600 dark:text-pink-300 border-pink-500/30';
-      case 'pro':
-        return 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border-indigo-500/30';
-      case 'starter':
-        return 'bg-blue-500/15 text-blue-600 dark:text-blue-300 border-blue-500/30';
-      case 'free':
-      default:
-        return 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30';
+  // Tier Colors (Basic vs Pro)
+  const getTierBadge = (tier?: string) => {
+    const normalized = (tier || 'basic').toLowerCase();
+    if (normalized === 'pro' || normalized === 'enterprise' || normalized === 'agency') {
+      return 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border-indigo-500/30';
     }
+    return 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30';
   };
 
   // Status Colors
@@ -664,11 +656,8 @@ export default function AdminUsersPage() {
               className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="all">Semua Paket</option>
-              <option value="enterprise">Enterprise</option>
-              <option value="agency">Agency</option>
+              <option value="basic">Basic</option>
               <option value="pro">Pro</option>
-              <option value="starter">Starter</option>
-              <option value="free">Free</option>
             </select>
           </div>
         </div>
@@ -1006,11 +995,8 @@ export default function AdminUsersPage() {
                     onChange={(e) => setInviteTier(e.target.value as SubscriptionTier)}
                     className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="free">Free</option>
-                    <option value="starter">Starter</option>
+                    <option value="basic">Basic (Gratis)</option>
                     <option value="pro">Pro</option>
-                    <option value="agency">Agency</option>
-                    <option value="enterprise">Enterprise</option>
                   </select>
                 </div>
               </div>
@@ -1116,11 +1102,8 @@ export default function AdminUsersPage() {
                     onChange={(e) => setBulkSubTier(e.target.value as SubscriptionTier)}
                     className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="free">Free</option>
-                    <option value="starter">Starter</option>
+                    <option value="basic">Basic (Gratis)</option>
                     <option value="pro">Pro</option>
-                    <option value="agency">Agency</option>
-                    <option value="enterprise">Enterprise</option>
                   </select>
                 </div>
               </div>
@@ -1298,11 +1281,8 @@ export default function AdminUsersPage() {
                     onChange={(e) => setActiveEditingUser({ ...activeEditingUser, tier: e.target.value as SubscriptionTier })}
                     className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm"
                   >
-                    <option value="free">Free</option>
-                    <option value="starter">Starter</option>
+                    <option value="basic">Basic (Gratis)</option>
                     <option value="pro">Pro</option>
-                    <option value="agency">Agency</option>
-                    <option value="enterprise">Enterprise</option>
                   </select>
                 </div>
               </div>

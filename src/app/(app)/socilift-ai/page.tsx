@@ -186,13 +186,18 @@ export default function SociliftAIPage() {
   const fetchSessions = async () => {
     if (!currentBrand) return;
     try {
-      const res = await fetch(`/api/ai/chat/sessions?brandId=${currentBrand.id}`);
+      const res = await fetch(`/api/ai/chat/sessions?brandId=${currentBrand.id}&userId=${user?.id || ''}`);
       if (res.ok) {
         const data = await res.json();
         const list = data.sessions || [];
         setSessions(list);
-        if (list.length > 0 && !activeSessionId) {
-          setActiveSessionId(list[0].id);
+        if (list.length > 0) {
+          if (!activeSessionId || !list.some((s: AIChatSession) => s.id === activeSessionId)) {
+            setActiveSessionId(list[0].id);
+          }
+        } else {
+          setActiveSessionId(null);
+          setMessages([]);
         }
       }
     } catch (e) {
@@ -214,7 +219,7 @@ export default function SociliftAIPage() {
 
   useEffect(() => {
     fetchSessions();
-  }, [currentBrand]);
+  }, [currentBrand, user?.id]);
 
   useEffect(() => {
     if (activeSessionId) {
@@ -380,7 +385,6 @@ export default function SociliftAIPage() {
     }
   };
 
-  // 1-Click: Open Content Creation Modal directly
   const handleOpenContentModalWithAI = (text: string) => {
     const { title, hook, platform } = extractIdeaDetails(text);
     setContentToCreate({
@@ -391,6 +395,20 @@ export default function SociliftAIPage() {
       status: 'ideation',
     });
     setContentModalOpen(true);
+  };
+
+  const handleDeleteSession = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    try {
+      await fetch(`/api/ai/chat/sessions?id=${id}`, { method: 'DELETE' });
+      const remaining = sessions.filter(s => s.id !== id);
+      setSessions(remaining);
+      if (activeSessionId === id) {
+        setActiveSessionId(remaining[0]?.id || null);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -412,7 +430,7 @@ export default function SociliftAIPage() {
           <span className="font-black text-xs text-slate-800 dark:text-slate-200 uppercase tracking-wider">Histori Chat</span>
           <button
             onClick={handleCreateSession}
-            className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition"
+            className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition cursor-pointer"
             title="Chat Baru"
           >
             <Plus className="w-4 h-4" />
@@ -426,18 +444,27 @@ export default function SociliftAIPage() {
             </div>
           ) : (
             sessions.map(s => (
-              <button
+              <div
                 key={s.id}
                 onClick={() => setActiveSessionId(s.id)}
-                className={`w-full text-left p-2.5 rounded-xl text-xs font-bold truncate flex items-center gap-2.5 transition ${
+                className={`w-full text-left p-2.5 rounded-xl text-xs font-bold truncate flex items-center justify-between gap-2 transition cursor-pointer group ${
                   activeSessionId === s.id
                     ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-xs border border-slate-200 dark:border-slate-700'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
-                <MessageSquare className="w-4 h-4 shrink-0 text-slate-400" />
-                <span className="truncate">{s.title}</span>
-              </button>
+                <div className="flex items-center gap-2 truncate flex-1">
+                  <MessageSquare className="w-4 h-4 shrink-0 text-slate-400" />
+                  <span className="truncate">{s.title}</span>
+                </div>
+                <button
+                  onClick={(e) => handleDeleteSession(e, s.id)}
+                  className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-500 rounded transition cursor-pointer"
+                  title="Hapus Percakapan"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
             ))
           )}
         </div>

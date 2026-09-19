@@ -6,7 +6,8 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const brandId = searchParams.get('brandId') || undefined;
-    const sessions = dbStore.getChatSessions(brandId);
+    const userId = searchParams.get('userId') || undefined;
+    const sessions = dbStore.getChatSessions(brandId, userId);
     return NextResponse.json({ sessions });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -31,6 +32,19 @@ export async function POST(req: Request) {
 
     const created = dbStore.createChatSession(newSession);
     return NextResponse.json({ success: true, session: created });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Session ID required' }, { status: 400 });
+
+    dbStore.deleteChatSession(id);
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

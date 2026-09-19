@@ -29,6 +29,7 @@ import {
   Eye,
 } from 'lucide-react';
 import SociliftLogo from '@/components/ui/socilift-logo';
+import UpgradeModal from '@/components/layout/upgrade-modal';
 
 export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () => void }) {
   const pathname = usePathname();
@@ -48,7 +49,9 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
   const { theme, toggleTheme } = useTheme();
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
+  const isAdmin = (role === 'dashboard_admin' || user?.email === 'rickyrizkymnf123@gmail.com') && !isImpersonating;
   const canInspect = originalRole === 'dashboard_admin' || user?.email === 'rickyrizkymnf123@gmail.com' || isImpersonating;
 
   const navItems = [
@@ -60,7 +63,7 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
     { label: 'Laporan', href: '/report', icon: FileSpreadsheet },
     { label: 'AI Extractor', href: '/ai-extractor', icon: ScanText },
     { label: 'Socilift AI', href: '/socilift-ai', icon: BotMessageSquare },
-    { label: 'Kelola Langganan', href: '/admin/users', icon: Crown },
+    ...(isAdmin ? [{ label: 'Kelola Langganan', href: '/admin/users', icon: Crown }] : []),
     { label: 'Changelog', href: '/changelog', icon: History },
     { label: 'Pengaturan', href: '/settings/brand', icon: Settings },
   ];
@@ -148,6 +151,26 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
         })}
       </nav>
 
+      {/* Upgrade to Pro Card for Users */}
+      {!isAdmin && (
+        <div className="p-3 mx-3 mb-2 rounded-2xl bg-gradient-to-br from-blue-900/40 via-indigo-950/50 to-slate-900 border border-blue-500/30 text-white shadow-md relative overflow-hidden">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Crown className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-xs font-black text-white">Upgrade ke Pro</span>
+          </div>
+          <p className="text-[10px] text-slate-300 leading-relaxed mb-2">
+            Akses tak terbatas untuk asisten AI, multi-platform & ekspor.
+          </p>
+          <button
+            onClick={() => setUpgradeModalOpen(true)}
+            className="w-full py-1.5 px-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-[11px] rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <Sparkles className="w-3 h-3 text-amber-300" />
+            <span>Upgrade Akun</span>
+          </button>
+        </div>
+      )}
+
       {/* User Profile & Role Switcher */}
       <div className="p-3 border-t border-slate-800 bg-slate-950/60 relative">
         {canInspect && (
@@ -220,6 +243,11 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
           </div>
         )}
       </div>
+
+      <UpgradeModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+      />
     </aside>
   );
 }

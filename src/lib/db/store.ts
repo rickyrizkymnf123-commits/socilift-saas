@@ -394,12 +394,12 @@ function getInitialData(): DatabaseState {
     {
       id: 'sub-admin',
       user_id: adminProfile.id,
-      tier: 'enterprise',
+      tier: 'pro',
       status: 'active',
       is_free_access: true,
       start_date: isoNow,
       end_date: new Date(Date.now() + 3650 * 86400000).toISOString(),
-      notes: 'Super Admin Lifetime Enterprise Access',
+      notes: 'Super Admin Lifetime Pro Access',
       created_at: isoNow,
       updated_at: isoNow,
     },
@@ -509,10 +509,18 @@ class LocalDBStore {
   // --- Organizations & Members ---
   getOrganizations() { return this.data.organizations; }
   getOrganization(id: string) { return this.data.organizations.find(o => o.id === id); }
+  createOrganization(org: Organization) {
+    this.data.organizations.push(org);
+    this.persist();
+    return org;
+  }
   getMembers(orgId: string) {
     return this.data.organization_members
       .filter(m => m.org_id === orgId)
       .map(m => ({ ...m, profile: this.getProfile(m.user_id) }));
+  }
+  getUserMemberships(userId: string) {
+    return this.data.organization_members.filter(m => m.user_id === userId);
   }
   addMember(member: OrganizationMember) {
     this.data.organization_members.push(member);
@@ -785,9 +793,11 @@ class LocalDBStore {
   }
 
   // --- AI Chat Sessions & Messages ---
-  getChatSessions(brandId?: string) {
-    return (brandId ? this.data.ai_chat_sessions.filter(s => s.brand_id === brandId) : this.data.ai_chat_sessions)
-      .sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
+  getChatSessions(brandId?: string, userId?: string) {
+    let list = this.data.ai_chat_sessions;
+    if (brandId) list = list.filter(s => s.brand_id === brandId);
+    if (userId) list = list.filter(s => !s.user_id || s.user_id === userId);
+    return list.sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
   }
   getChatSession(id: string) {
     return this.data.ai_chat_sessions.find(s => s.id === id);
@@ -796,6 +806,12 @@ class LocalDBStore {
     this.data.ai_chat_sessions.push(session);
     this.persist();
     return session;
+  }
+  deleteChatSession(id: string) {
+    this.data.ai_chat_sessions = this.data.ai_chat_sessions.filter(s => s.id !== id);
+    this.data.ai_chat_messages = this.data.ai_chat_messages.filter(m => m.session_id !== id);
+    this.persist();
+    return true;
   }
   getChatMessages(sessionId: string) {
     return this.data.ai_chat_messages

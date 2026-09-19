@@ -12,12 +12,56 @@ export async function GET() {
       user = dbStore.getProfiles()[0];
     }
 
-    const orgs = dbStore.getOrganizations();
-    const org = orgs[0];
-    const members = dbStore.getMembers(org.id);
-    const member = members.find(m => m.user_id === user.id);
-    const role = member?.role || 'dashboard_admin';
-    const brands = dbStore.getBrands(org.id);
+    const allMembers = dbStore.getUserMemberships(user.id);
+    let org = null;
+    let role = user.email.toLowerCase() === 'rickyrizkymnf123@gmail.com' ? 'dashboard_admin' : 'creator';
+
+    if (allMembers.length > 0) {
+      org = dbStore.getOrganization(allMembers[0].org_id);
+      role = allMembers[0].role;
+    }
+
+    if (!org) {
+      // Find or create user's personal organization
+      const nowIso = new Date().toISOString();
+      const isAdmin = user.email.toLowerCase() === 'rickyrizkymnf123@gmail.com';
+      org = {
+        id: 'org-' + user.id,
+        name: `${user.display_name || user.email.split('@')[0]}'s Workspace`,
+        owner_id: user.id,
+        created_at: nowIso,
+      };
+      dbStore.createOrganization(org);
+      dbStore.addMember({
+        org_id: org.id,
+        user_id: user.id,
+        role: isAdmin ? 'dashboard_admin' : 'creator',
+        created_at: nowIso,
+      });
+      role = isAdmin ? 'dashboard_admin' : 'creator';
+    }
+
+    let brands = dbStore.getBrands(org.id);
+    if (brands.length === 0) {
+      const newBrand = {
+        id: 'brand-' + user.id,
+        org_id: org.id,
+        name: `${user.display_name || user.email.split('@')[0]} Studio`,
+        color: '#3B82F6',
+        pillars: ['Edukasi & Tips', 'Inspirasi', 'Promosi Produk'],
+        funnels: ['TOFU (Top of Funnel)', 'MOFU (Middle of Funnel)', 'BOFU (Bottom of Funnel)'],
+        objectives: ['Brand Awareness', 'Engagement', 'Sales'],
+        details: {
+          niche: 'Kreator Konten',
+          toneOfVoice: 'Casual & Menarik',
+          targetAudience: 'Audiens Media Sosial',
+        },
+        created_by: user.id,
+        created_at: new Date().toISOString(),
+      };
+      dbStore.createBrand(newBrand);
+      brands = [newBrand];
+    }
 
     return NextResponse.json({
       user,
