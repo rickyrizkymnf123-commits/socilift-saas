@@ -1,95 +1,155 @@
 import React from 'react';
 
+export type LogoVariant = 'ascend' | 'bolt' | 'prism' | 'wave' | 'minimal';
+
 interface SociliftLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showWordmark?: boolean;
   subtitle?: string | null;
   className?: string;
-  glow?: boolean;
+  variant?: LogoVariant;
 }
 
 export function SociliftIcon({
   size = 'md',
-  className = '',
+  variant = 'ascend',
   glow = true,
+  className = '',
 }: {
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  className?: string;
+  variant?: LogoVariant;
   glow?: boolean;
+  className?: string;
 }) {
   const sizeMap = {
     sm: 'w-7 h-7',
-    md: 'w-9 h-9',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16',
+    md: 'w-8 h-8',
+    lg: 'w-11 h-11',
+    xl: 'w-14 h-14',
   };
 
-  const containerSizes = {
-    sm: 'p-1 rounded-lg',
-    md: 'p-1.5 rounded-xl',
-    lg: 'p-2 rounded-2xl',
-    xl: 'p-3 rounded-3xl',
+  const iconSizes = {
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6',
+    xl: 'w-8 h-8',
   };
 
   return (
     <div
-      className={`relative flex items-center justify-center shrink-0 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 ${containerSizes[size]} ${
-        glow ? 'shadow-lg shadow-blue-500/30' : ''
-      } border border-blue-400/30 transition-transform duration-200 hover:scale-105 select-none ${className}`}
+      className={`relative flex items-center justify-center shrink-0 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 shadow-md shadow-blue-500/20 border border-blue-400/30 transition-all duration-200 hover:scale-105 hover:shadow-blue-500/40 ${sizeMap[size]} ${className}`}
     >
-      <svg
-        className={sizeMap[size]}
-        viewBox="0 0 64 64"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <linearGradient id="sl-quantum-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#3B82F6" />
-            <stop offset="50%" stopColor="#6366F1" />
-            <stop offset="100%" stopColor="#06B6D4" />
-          </linearGradient>
-          <linearGradient id="sl-quantum-core" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#F59E0B" />
-            <stop offset="45%" stopColor="#EC4899" />
-            <stop offset="100%" stopColor="#FBBF24" />
-          </linearGradient>
-          <filter id="sl-glow-filter" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2.5" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-        </defs>
+      {/* Concept 1 (Default): Ascend S - Linear / Raycast style geometric upward monogram */}
+      {variant === 'ascend' && (
+        <svg
+          className={`${iconSizes[size]} text-white`}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 16L12 4L20 16H14L12 11L10 16H4Z"
+            fill="url(#asc-grad)"
+          />
+          <path
+            d="M8 19L12 13L16 19H8Z"
+            fill="#38BDF8"
+          />
+          <defs>
+            <linearGradient id="asc-grad" x1="12" y1="4" x2="12" y2="16" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FFFFFF" />
+              <stop offset="1" stopColor="#93C5FD" />
+            </linearGradient>
+          </defs>
+        </svg>
+      )}
 
-        {/* Outer Hexagon Quantum Shield */}
-        <path
-          d="M32 5L55 18.5V45.5L32 59L9 45.5V18.5L32 5Z"
-          fill="url(#sl-quantum-bg)"
-          fillOpacity="0.25"
-          stroke="url(#sl-quantum-bg)"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-        />
+      {/* Concept 2: Bolt Lift - Clean razor sharp lightning chevron */}
+      {variant === 'bolt' && (
+        <svg
+          className={`${iconSizes[size]} text-white`}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
+            fill="url(#bolt-grad)"
+            stroke="#93C5FD"
+            strokeWidth="0.5"
+          />
+          <defs>
+            <linearGradient id="bolt-grad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FDE047" />
+              <stop offset="0.5" stopColor="#38BDF8" />
+              <stop offset="1" stopColor="#818CF8" />
+            </linearGradient>
+          </defs>
+        </svg>
+      )}
 
-        {/* Neural Grid Lines */}
-        <path
-          d="M32 13L47 22V42L32 51L17 42V22L32 13Z"
-          stroke="#93C5FD"
-          strokeWidth="1.2"
-          strokeDasharray="2.5 2.5"
-          opacity="0.8"
-        />
+      {/* Concept 3: Prism Spark - Clean OpenAI/Perplexity geometric 4-point star */}
+      {variant === 'prism' && (
+        <svg
+          className={`${iconSizes[size]} text-white`}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z"
+            fill="url(#prism-grad)"
+          />
+          <circle cx="12" cy="12" r="2.5" fill="#FFFFFF" />
+          <defs>
+            <linearGradient id="prism-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#38BDF8" />
+              <stop offset="1" stopColor="#C084FC" />
+            </linearGradient>
+          </defs>
+        </svg>
+      )}
 
-        {/* Ascending Futuristic Beam / Rocket Wing */}
-        <path
-          d="M32 14L44 26L37 26L42 38L32 32L22 38L27 26L20 26L32 14Z"
-          fill="url(#sl-quantum-core)"
-          filter="url(#sl-glow-filter)"
-        />
+      {/* Concept 4: Wave Loop - Fluid infinite growth */}
+      {variant === 'wave' && (
+        <svg
+          className={`${iconSizes[size]} text-white`}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6 15C6 11.5 9 8 13 8C17 8 18 5.5 18 4"
+            stroke="#38BDF8"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          <path
+            d="M6 20C6 18.5 7 16 11 16C15 16 18 12.5 18 9"
+            stroke="#818CF8"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
 
-        {/* Orbit Quantum Spark */}
-        <circle cx="47" cy="18.5" r="3.5" fill="#FDE047" filter="url(#sl-glow-filter)" />
-        <circle cx="17" cy="45.5" r="2.5" fill="#38BDF8" />
-      </svg>
+      {/* Concept 5: Minimal Modern 'S' Monogram */}
+      {variant === 'minimal' && (
+        <svg
+          className={`${iconSizes[size]} text-white`}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7 6C7 4.89543 7.89543 4 9 4H17C18.1046 4 19 4.89543 19 6V9C19 10.1046 18.1046 11 17 11H10C8.89543 11 8 11.8954 8 13V17C8 18.1046 8.89543 19 10 19H18C19.1046 19 20 18.1046 20 17"
+            stroke="#FFFFFF"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
     </div>
   );
 }
@@ -98,44 +158,26 @@ export default function SociliftLogo({
   size = 'md',
   showWordmark = true,
   subtitle,
+  variant = 'ascend',
   className = '',
-  glow = true,
 }: SociliftLogoProps) {
-  const textSizes = {
-    sm: 'text-xs',
-    md: 'text-sm',
-    lg: 'text-lg',
-    xl: 'text-2xl',
-  };
-
-  const badgeSizes = {
-    sm: 'text-[8px] px-1 py-0.2',
-    md: 'text-[9px] px-1.5 py-0.5',
-    lg: 'text-[11px] px-2 py-0.5',
-    xl: 'text-xs px-2.5 py-1',
-  };
-
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
-      <SociliftIcon size={size} glow={glow} />
+      <SociliftIcon size={size} variant={variant} />
 
       {showWordmark && (
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`font-black tracking-tight text-white ${textSizes[size]} truncate block font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-200`}
-            >
+          <div className="flex items-center gap-2">
+            <span className="font-black text-white text-base tracking-tight block">
               Socilift
             </span>
-            <span
-              className={`font-black uppercase tracking-wider rounded-md bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white shadow-xs border border-blue-400/40 shrink-0 ${badgeSizes[size]}`}
-            >
-              Plus
+            <span className="px-1.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              PLUS
             </span>
           </div>
 
           {subtitle !== undefined && (
-            <span className="text-[10px] text-slate-400 dark:text-slate-400 block truncate font-medium mt-0.5">
+            <span className="text-[11px] text-slate-400 block truncate font-medium mt-0.5">
               {subtitle || 'SaaS Media Agency'}
             </span>
           )}
