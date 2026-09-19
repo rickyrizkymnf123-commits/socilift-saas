@@ -231,4 +231,22 @@
       - Git commit `7d8ec74` dipush ke branch `main`.
       - Terdeploy dan aktif di `https://socilift-saas.vercel.app`.
 
+30. **Pemisahan Hak Akses Menu, Simplifikasi Tier (Basic & Pro) & Isolasi Data Multi-Tenant (19 Sep 2026)**:
+    - **Penyembunyian Menu Admin untuk User Biasa**:
+      - Menu "Kelola Langganan" (`/admin/users`) sekarang hanya muncul jika login sebagai Super Admin (`role === 'dashboard_admin'`) dan tidak sedang dalam Mode Intip.
+      - User reguler / non-admin tidak akan pernah melihat menu admin tersebut.
+      - Menambahkan kartu **"Upgrade ke Pro"** di sidebar beserta modal komparasi benefit paket (`src/components/layout/upgrade-modal.tsx`).
+    - **Simplifikasi Tier Paket (Hanya Basic & Pro)**:
+      - Menghapus opsi tier `Starter`, `Agency`, `Enterprise` dari seluruh dropdown, filter, dan modal admin.
+      - Pilihan paket kini murni: **Basic (Gratis)** dan **Pro (Full AI & Content)**.
+    - **Isolasi Data Per-User / Multi-Tenant**:
+      - Setiap pengguna yang mendaftar/login memiliki Workspace (Organisasi) dan Brand mandiri yang terisolasi 100%.
+      - Histori chat Socilift AI (`/api/ai/chat/sessions`) kini difilter berdasarkan `userId`, sehingga chat admin dan chat antar pengguna tidak akan pernah bercampur.
+      - Ditambahkan tombol hapus chat session pada daftar riwayat.
+    - **Verifikasi & Sinkronisasi Produksi**:
+      - `npx tsc --noEmit` lolos 0 errors.
+      - `npm run build` sukses tanpa error.
+      - Terdeploy dan live di `https://socilift-saas.vercel.app`.
+
+
 
