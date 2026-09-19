@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/auth-context';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { SociliftIcon } from '@/components/ui/socilift-logo';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -24,14 +25,19 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md mb-4 border border-white/20">
-            <Sparkles className="w-8 h-8 text-yellow-300" />
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+      <div className="max-w-md w-full bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden">
+        <div className="bg-gradient-to-b from-slate-800/80 to-slate-900/90 p-8 text-white text-center border-b border-slate-800">
+          <div className="flex justify-center mb-3">
+            <SociliftIcon size="lg" glow={true} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Daftar Akun Socilift</h1>
-          <p className="text-blue-100 text-sm mt-1">Mulai rencanakan konten viral brand Anda</p>
+          <div className="flex items-center justify-center gap-1.5">
+            <h1 className="text-2xl font-black tracking-tight text-white">Daftar Akun Socilift</h1>
+            <span className="px-2 py-0.5 rounded-md text-xs font-black uppercase tracking-wider bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/40">
+              Plus
+            </span>
+          </div>
+          <p className="text-slate-400 text-xs mt-1 font-medium">Mulai rencanakan konten viral brand Anda</p>
         </div>
 
         <form onSubmit={handleSignup} className="p-8 space-y-4">

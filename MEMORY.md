@@ -52,3 +52,10 @@
 5. **Socilift AI Typography & Thinking Indicator (`/socilift-ai`)**:
    - Parser markdown murni (`parseInlineFormatting`) mengubah simbol `**`, `*`, `###`, `1.`, `-` menjadi elemen visual bersih dengan ketebalan teks tegas tanpa simbol karakter mentah.
    - Animated thinking bubble dengan 3-dot bounce, pulse avatar, dan rotating sparkles saat AI merumuskan jawaban.
+
+## Production Deployment & Infrastructure (19 Sep 2026)
+- **Live Production URL**: `https://socilift-saas.vercel.app`
+- **GitHub Repo**: `https://github.com/rickyrizkymnf123-commits/socilift-saas` (branch: `main`)
+- **Supabase Project**: `socilift-saas` (`pytmquulcvkkqzsfvlwz`) Region: `ap-southeast-1` (Isolated from `tools-sakti`).
+- **Vercel Team**: `team_rJcdVvmqpKTfIFC5UGcIaLQR` (Project: `socilift-saas`).
+- **Super Admin Login**: `rickyrizkymnf123@gmail.com` / `Permatasari11` (Enterprise Lifetime).

@@ -162,3 +162,16 @@
       1. **GitHub Personal Access Token (Classic/Fine-grained)** untuk push repo, workflow CI/CD, dan sinkronisasi codebase.
       2. **Vercel Access Token** untuk automasi CLI deployment dan integrasi cloud hosting.
       3. **Supabase Access Token & Project API Keys (Anon/Service Role/Connection String)** untuk integrasi database cloud dan migrasi backend.
+
+25. **Rilis Produksi Penuh ke Supabase Terisolasi, GitHub & Vercel (19 Sep 2026)**:
+    - **Supabase Cloud**:
+      - Dibuat project mandiri `socilift-saas` (`pytmquulcvkkqzsfvlwz`) di region `ap-southeast-1` tanpa menyentuh project `tools-sakti` (`mwgzbloxwqtqkvvstwtc`).
+      - Migrasi skema database `0001_init.sql` dan `0002_subscriptions.sql` berhasil 100%.
+      - Super Admin `rickyrizkymnf123@gmail.com` berhasil diaktifkan dengan paket Enterprise Lifetime.
+    - **GitHub**:
+      - Repository dibuat di `https://github.com/rickyrizkymnf123-commits/socilift-saas`.
+      - Inisialisasi git, commit rapi, dan push ke branch `main`.
+    - **Vercel Deployment**:
+      - Project dibuat dan dideploy ke tim `team_rJcdVvmqpKTfIFC5UGcIaLQR`.
+      - Environment variables dikonfigurasi lengkap.
+      - Domain publik aktif di `https://socilift-saas.vercel.app` dengan status HTTP 200 OK.

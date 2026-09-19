@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/auth-context';
-import { Sparkles, Shield, User, ArrowRight } from 'lucide-react';
+import { Shield, User, ArrowRight } from 'lucide-react';
+import { SociliftIcon } from '@/components/ui/socilift-logo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
     const success = await login(email);
     if (success) {
       router.push('/dashboard');
@@ -26,9 +28,8 @@ export default function LoginPage() {
     }
   };
 
-  const quickLogin = async (targetEmail: string, targetPass: string = 'Permatasari11') => {
+  const quickLogin = async (targetEmail: string) => {
     setEmail(targetEmail);
-    setPassword(targetPass);
     setLoading(true);
     setError('');
     const success = await login(targetEmail);
@@ -41,19 +42,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md mb-4 border border-white/20">
-            <Sparkles className="w-8 h-8 text-yellow-300" />
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+      <div className="max-w-md w-full bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden">
+        <div className="bg-gradient-to-b from-slate-800/80 to-slate-900/90 p-8 text-white text-center border-b border-slate-800 relative">
+          <div className="flex justify-center mb-3">
+            <SociliftIcon size="lg" glow={true} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Socilift Plus SaaS</h1>
-          <p className="text-blue-100 text-sm mt-1">Platform Content Planning & Otomasi AI</p>
+          <div className="flex items-center justify-center gap-1.5">
+            <h1 className="text-2xl font-black tracking-tight text-white">Socilift</h1>
+            <span className="px-2 py-0.5 rounded-md text-xs font-black uppercase tracking-wider bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/40">
+              Plus
+            </span>
+          </div>
+          <p className="text-slate-400 text-xs mt-1 font-medium">All-in-One Social Media AI Engine & Planner</p>
         </div>
 
         <div className="p-8">
           {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+            <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
               {error}
             </div>
           )}
@@ -104,18 +110,18 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => quickLogin('rickyrizkymnf123@gmail.com', 'Permatasari11')}
-                className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-50 text-blue-700 text-xs font-medium transition"
+                onClick={() => quickLogin('rickyrizkymnf123@gmail.com')}
+                className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-blue-500/30 bg-blue-950/40 hover:bg-blue-900/50 text-blue-400 text-xs font-bold transition"
               >
-                <Shield className="w-4 h-4 text-blue-600" />
+                <Shield className="w-4 h-4 text-blue-400" />
                 Admin (Ricky)
               </button>
               <button
                 type="button"
-                onClick={() => quickLogin('creator@socilift.local', 'password123')}
-                className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition"
+                onClick={() => quickLogin('creator@socilift.local')}
+                className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-300 text-xs font-bold transition"
               >
-                <User className="w-4 h-4 text-slate-600" />
+                <User className="w-4 h-4 text-slate-400" />
                 Creator Pro
               </button>
             </div>

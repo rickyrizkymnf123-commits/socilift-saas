@@ -27,6 +27,7 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
+import SociliftLogo from '@/components/ui/socilift-logo';
 
 export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () => void }) {
   const pathname = usePathname();
@@ -37,11 +38,11 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { label: 'Kalender Konten', href: '/calendar', icon: CalendarDays },
-    { label: 'Content Database', href: '/content', icon: Database },
+    { label: 'Kalender', href: '/calendar', icon: CalendarDays },
+    { label: 'Database', href: '/content', icon: Database },
     { label: 'Kanban Board', href: '/backlog', icon: Kanban },
-    { label: 'Analisis Konten', href: '/analytics', icon: BarChart3 },
-    { label: 'Laporan Konten', href: '/report', icon: FileSpreadsheet },
+    { label: 'Analisis', href: '/analytics', icon: BarChart3 },
+    { label: 'Laporan', href: '/report', icon: FileSpreadsheet },
     { label: 'AI Extractor', href: '/ai-extractor', icon: ScanText },
     { label: 'Socilift AI', href: '/socilift-ai', icon: BotMessageSquare },
     { label: 'Kelola Langganan', href: '/admin/users', icon: Crown },
@@ -53,17 +54,9 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
     <aside className="w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col h-screen border-r border-slate-800 shrink-0 select-none transition-colors duration-200">
       {/* App Header */}
       <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-            <Sparkles className="w-5 h-5 text-yellow-300" />
-          </div>
-          <div>
-            <span className="font-bold text-white text-base tracking-tight block">Socilift Plus</span>
-            <span className="text-[11px] text-slate-400 block truncate max-w-[130px]">
-              {currentOrg?.name || 'SaaS Agency'}
-            </span>
-          </div>
-        </div>
+        <Link href="/dashboard" className="block hover:opacity-90 transition">
+          <SociliftLogo size="md" subtitle={currentOrg?.name || 'SaaS Agency'} />
+        </Link>
       </div>
 
       {/* Brand Switcher */}
