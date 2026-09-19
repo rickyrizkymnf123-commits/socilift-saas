@@ -1,0 +1,190 @@
+{
+  "profiles": [
+    {
+      "id": "a0000000-0000-0000-0000-000000000001",
+      "email": "rickyrizkymnf123@gmail.com",
+      "display_name": "Ricky Rizky (Admin)",
+      "created_at": "2026-09-14T05:23:20.894Z"
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000001",
+      "email": "creator@socilift.local",
+      "display_name": "Creator Pro",
+      "created_at": "2026-09-14T05:23:20.894Z"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "o0000000-0000-0000-0000-000000000001",
+      "name": "Socilift Media Agency",
+      "owner_id": "a0000000-0000-0000-0000-000000000001",
+      "created_at": "2026-09-14T05:23:20.894Z"
+    }
+  ],
+  "organization_members": [
+    {
+      "org_id": "o0000000-0000-0000-0000-000000000001",
+      "user_id": "a0000000-0000-0000-0000-000000000001",
+      "role": "dashboard_admin",
+      "created_at": "2026-09-14T05:23:20.894Z",
+      "profile": {
+        "id": "a0000000-0000-0000-0000-000000000001",
+        "email": "rickyrizkymnf123@gmail.com",
+        "display_name": "Ricky Rizky (Admin)",
+        "created_at": "2026-09-14T05:23:20.894Z"
+      }
+    },
+    {
+      "org_id": "o0000000-0000-0000-0000-000000000001",
+      "user_id": "c0000000-0000-0000-0000-000000000001",
+      "role": "creator",
+      "created_at": "2026-09-14T05:23:20.894Z",
+      "profile": {
+        "id": "c0000000-0000-0000-0000-000000000001",
+        "email": "creator@socilift.local",
+        "display_name": "Creator Pro",
+        "created_at": "2026-09-14T05:23:20.894Z"
+      }
+    }
+  ],
+  "brands": [
+    {
+      "id": "b0000000-0000-0000-0000-000000000001",
+      "org_id": "o0000000-0000-0000-0000-000000000001",
+      "name": "Brand Utama (Socilift Studio)",
+      "color": "#2563EB",
+      "pillars": [
+        "Edukasi & Tutorial",
+        "Behind The Scene",
+        "Product Review",
+        "Entertainment / Relatable"
+      ],
+      "funnels": [
+        "TOFU (Top of Funnel)",
+        "MOFU (Middle of Funnel)",
+        "BOFU (Bottom of Funnel)"
+      ],
+      "objectives": [
+        "Brand Awareness",
+        "Lead Generation",
+        "Engagement",
+        "Sales & Conversion"
+      ],
+      "details": {
+        "niche": "Social Media Marketing & Creator Growth",
+        "productServiceDesc": "Platform otomasi konten dan strategi media sosial berbasis AI",
+        "targetAudience": "Content Creator, Social Media Specialist, Brand Owner",
+        "brandPositioning": "Modern, Praktis, High-Conversion",
+        "toneOfVoice": "Enerjik, Edukatif, Santai tapi Profesional",
+        "mainOffer": "Subscription Socilift Plus AI",
+        "usp": "All-in-one planner dengan AI hook and metrics tracking otomatis"
+      },
+      "created_by": "a0000000-0000-0000-0000-000000000001",
+      "created_at": "2026-09-14T05:23:20.894Z"
+    }
+  ],
+  "contents": [],
+  "content_approvals": [],
+  "content_comments": [],
+  "backlog_items": [],
+  "goals": [],
+  "metrics": [],
+  "activity_logs": [],
+  "notifications": [
+    {
+      "id": "n0000000-0000-0000-0000-000000000001",
+      "org_id": "o0000000-0000-0000-0000-000000000001",
+      "title": "Selamat Datang di Socilift SaaS Rebuild!",
+      "message": "Sistem content planner modern Anda siap digunakan. Atur pilar brand, goal platform, dan nikmati integrasi AI hook generator.",
+      "type": "feature_update",
+      "force_popup": false,
+      "created_at": "2026-09-14T05:23:20.894Z",
+      "updated_at": "2026-09-14T05:23:20.894Z"
+    }
+  ],
+  "notification_reads": [],
+  "ai_extractor_jobs": [],
+  "ai_chat_sessions": [
+    {
+      "id": "sess-1789759207719",
+      "brand_id": "b0000000-0000-0000-0000-000000000001",
+      "user_id": "c0000000-0000-0000-0000-000000000001",
+      "title": "Bantu riset 5 hook video TikTo...",
+      "status": "active",
+      "created_at": "2026-09-18T19:20:07.719Z",
+      "updated_at": "2026-09-18T19:20:18.878Z",
+      "last_message_at": "2026-09-18T19:20:18.878Z"
+    }
+  ],
+  "ai_chat_messages": [
+    {
+      "id": "msg-1789759208347",
+      "session_id": "sess-1789759207719",
+      "brand_id": "b0000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message_text": "Bantu riset 5 hook video TikTok viral untuk niche edukasi bisnis",
+      "message_type": "text",
+      "created_at": "2026-09-18T19:20:08.347Z"
+    },
+    {
+      "id": "msg-1789759218879",
+      "session_id": "sess-1789759207719",
+      "brand_id": "b0000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message_text": "Siap! Ini dia 5 ide hook TikTok viral untuk niche edukasi bisnis, yang dijamin bikin audiens kamu langsung berhenti scrolling dan penasaran:\n\n---\n\n1.  **Hook 3 Detik Pertama**: \"Capek bikin konten, tapi view stuck di 100?\"\n    *   **Kenapa viral?**: Langsung menyentuh *pain point* umum para kreator dan pemilik brand. Ini pertanyaan yang sering banget ada di kepala mereka, bikin langsung relate dan merasa \"Ini ngomongin aku banget!\".\n\n2.  **Hook 3 Detik Pertama**: \"Rahasia biar 1 ide konten jadi 7 jenis konten beda, langsung FYP!\"\n    *   **Kenapa viral?**: Menawarkan \"rahasia\" dan solusi efisiensi yang sangat dicari. Siapa sih yang nggak mau kerja sekali tapi hasilnya maksimal? Apalagi dijanjikan langsung FYP, ini *trigger* FOMO (Fear of Missing Out) dan rasa ingin tahu.\n\n3.  **Hook 3 Detik Pertama**: \"Stop! Jangan lagi buang-buang waktu di TikTok!\"\n    *   **Kenapa viral?**: Super *disruptive* dan bikin orang langsung penasaran kenapa harus berhenti. Setelah itu, kamu bisa lanjut dengan trik efisiensi atau strategi baru yang bikin waktu mereka di TikTok jadi lebih produktif.\n\n4.  **Hook 3 Detik Pertama**: \"STOP SCROLLING! Bisnis kamu bisa **auto-viral** pakai trik ini!\"\n    *   **Kenapa viral?**: Menggunakan kata seruan yang kuat dan langsung mengklaim solusi yang diidam-idamkan: \"auto-viral\". Kata \"trik\" juga memicu rasa ingin tahu, seolah ada *shortcut* yang akan dibagikan. Ini sangat cocok dengan konsep Socilift yang serba otomatis dengan AI.\n\n5.  **Hook 3 Detik Pertama**: \"Dari pusing mikirin konten, jadi cuan tiap hari dari TikTok!\"\n    *   **Kenapa viral?**: Menjual *transformasi* yang diinginkan semua pebisnis dan kreator. Dari masalah (pusing mikirin konten) ke solusi (cuan tiap hari). Ini langsung menargetkan motivasi finansial dan kemudahan, yang sangat kuat.\n\n---\n\nDengan hook-hook ini, dijamin video edukasi bisnismu punya potensi besar untuk meledak di TikTok!",
+      "message_type": "text",
+      "created_at": "2026-09-18T19:20:18.878Z"
+    }
+  ],
+  "ai_usage_logs": [
+    {
+      "id": "log-1789759218879",
+      "brand_id": "b0000000-0000-0000-0000-000000000001",
+      "user_id": "c0000000-0000-0000-0000-000000000001",
+      "feature_source": "socilift_ai_chat",
+      "model_name": "gemini-2.5-flash",
+      "request_type": "chat_message",
+      "status": "success",
+      "input_tokens": 200,
+      "output_tokens": 450,
+      "created_at": "2026-09-18T19:20:18.879Z"
+    }
+  ],
+  "gemini_settings": [
+    {
+      "org_id": "o0000000-0000-0000-0000-000000000001",
+      "api_key_encrypted": "",
+      "selected_model": "gemini-2.5-flash",
+      "status": "Active & Verified",
+      "last_tested_at": "2026-09-16T08:56:10.554Z",
+      "updated_at": "2026-09-16T08:56:10.554Z"
+    }
+  ],
+  "user_subscriptions": [
+    {
+      "id": "sub-admin",
+      "user_id": "a0000000-0000-0000-0000-000000000001",
+      "tier": "enterprise",
+      "status": "active",
+      "is_free_access": true,
+      "start_date": "2026-06-18T08:49:46.074Z",
+      "end_date": "2036-09-13T08:49:46.074Z",
+      "notes": "Super Admin Lifetime Enterprise Access",
+      "created_at": "2026-09-16T08:49:46.074Z",
+      "updated_at": "2026-09-16T08:49:46.074Z"
+    },
+    {
+      "id": "sub-creator",
+      "user_id": "c0000000-0000-0000-0000-000000000001",
+      "tier": "pro",
+      "status": "active",
+      "is_free_access": false,
+      "start_date": "2026-09-06T08:49:46.074Z",
+      "end_date": "2026-10-06T08:49:46.074Z",
+      "notes": "Paket Pro Bulanan Creator Plus",
+      "created_at": "2026-09-16T08:49:46.074Z",
+      "updated_at": "2026-09-16T08:49:46.074Z"
+    }
+  ],
+  "user_invitations": []
+}
