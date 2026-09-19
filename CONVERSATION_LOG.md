@@ -215,3 +215,20 @@
       - Next.js production build (`npm run build`) sukses tanpa peringatan.
       - Terdeploy dan live di `https://socilift-saas.vercel.app`.
 
+29. **Penyempurnaan Pusat Simulasi & Intip Tampilan Users ala LP Builder (19 Sep 2026)**:
+    - **Modal Pusat Simulasi (`src/components/layout/user-inspector-modal.tsx`)**:
+      - **Tab 1 (Intip Role & Akun)**: 5 preset akun instan (Creator Pro, Manager Enterprise, Trial Starter, Expired Account, Client View-Only) + Dropdown live akun nyata dari database Supabase.
+      - **Tab 2 (Simulasi Perangkat ala LP Builder)**: Simulasi ukuran layar Desktop Penuh (100%), Laptop 14" (1280px), Tablet iPad Air (768px), dan Mobile iPhone 15 Pro (375px) dengan frame bingkai perangkat dan scroll interaktif.
+      - **Tab 3 (Matriks Hak Akses)**: Tabel detail hak akses per role & tier paket.
+    - **Floating Quick Switcher & Action Banner (`src/app/(app)/layout.tsx`)**:
+      - Tombol cepat ganti role/status langsung di atas layar tanpa reload (`Creator Pro`, `Manager`, `Trial`, `Expired`).
+      - Tombol pintas buka modal pusat intip (`[Pusat Intip]`) dan tombol keluar instan ke Super Admin (`[Keluar]`).
+    - **Integrasi Topbar & Sidebar**:
+      - Tombol aksen amber **`[👁️ Intip Tampilan]`** di Topbar dan **`[👁️ Mode Intip Pengguna]`** di footer Sidebar.
+    - **Verifikasi & Sinkronisasi Produksi**:
+      - `npx tsc --noEmit` lulus 0 errors.
+      - `npm run build` sukses 41/41 routes.
+      - Git commit `7d8ec74` dipush ke branch `main`.
+      - Terdeploy dan aktif di `https://socilift-saas.vercel.app`.
+
+

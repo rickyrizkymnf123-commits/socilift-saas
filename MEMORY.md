@@ -53,15 +53,18 @@
    - Parser markdown murni (`parseInlineFormatting`) mengubah simbol `**`, `*`, `###`, `1.`, `-` menjadi elemen visual bersih dengan ketebalan teks tegas tanpa simbol karakter mentah.
    - Animated thinking bubble dengan 3-dot bounce, pulse avatar, dan rotating sparkles saat AI merumuskan jawaban.
 
-## Impersonation Suite & Luxury Brand Identity (19 Sep 2026)
-- **Fitur Intip (User Impersonation / "View as User" Mode)**:
-  - Tersedia di Auth Context (`src/lib/auth/auth-context.tsx`) dengan persistensi `localStorage`.
-  - Floating Sticky Amber Banner di bagian atas seluruh halaman (`src/app/(app)/layout.tsx`) yang menampilkan identitas akun yang sedang diintip (Email, Role, Tier) dan tombol cepat `[✕ Keluar dari Mode Intip]`.
-  - Akses cepat via **Preset Bar** di `/admin/users`: Creator Pro, Manager, Free Trial, Expired Account.
-  - Tombol **`[Intip]`** langsung pada setiap baris tabel pengguna di `/admin/users`.
+## Impersonation Suite & Device Simulator ala LP Builder (19 Sep 2026)
+- **Pusat Simulasi & Intip Tampilan Pengguna (`src/components/layout/user-inspector-modal.tsx`)**:
+  - **Tab 1 (Intip Role & Akun)**: Presets instan (Creator Pro, Manager Enterprise, Trial Starter, Expired Account, Client View-Only) serta dropdown pemilihan akun riil dari Supabase database.
+  - **Tab 2 (Simulasi Perangkat ala LP Builder)**: Simulasi ukuran layar Desktop Penuh (100%), Laptop 14" (1280px), Tablet iPad (768px), dan Mobile iPhone (375px) dengan frame bingkai perangkat dan scroll interaktif.
+  - **Tab 3 (Matriks Hak Akses)**: Matriks lengkap fitur terbuka/terkunci untuk setiap role dan tier paket.
+- **Floating Sticky Action Banner**:
+  - Tombol ganti role 1-klik di atas layar (`[Creator Pro]`, `[Manager]`, `[Trial]`, `[Expired]`).
+  - Tombol pintas `[Pusat Intip]` dan tombol keluar instan `[✕ Keluar]` ke Super Admin.
+- **Akses Cepat di UI**:
+  - Tombol **`[👁️ Intip Tampilan]`** di Topbar dan **`[👁️ Mode Intip Pengguna]`** di footer Sidebar.
 - **Luxury Typography Wordmark Logo**:
-  - Menghilangkan ikon kotak yang kaku dan fokus pada tipografi brand murni bergaya modern & luxury (`Socilift` dengan cyan dot & minimalist luxury `PLUS` pill badge).
-  - Terintegrasi di seluruh rute: Sidebar (`src/components/layout/sidebar.tsx`), Login (`src/app/(auth)/login/page.tsx`), Signup (`src/app/(auth)/signup/page.tsx`), dan Splash (`src/app/page.tsx`).
+  - `Socilift` wordmark dengan cyan accent dot & minimalist luxury `PLUS` pill badge di seluruh layout aplikasi.
 
 ## Production Deployment & Infrastructure (19 Sep 2026)
 - **Live Production URL**: `https://socilift-saas.vercel.app`
@@ -69,4 +72,5 @@
 - **Supabase Project**: `socilift-saas` (`pytmquulcvkkqzsfvlwz`) Region: `ap-southeast-1` (Isolated from `tools-sakti`).
 - **Vercel Team**: `team_rJcdVvmqpKTfIFC5UGcIaLQR` (Project: `socilift-saas`).
 - **Super Admin Login**: `rickyrizkymnf123@gmail.com` / `Permatasari11` (Enterprise Lifetime).
+
 
