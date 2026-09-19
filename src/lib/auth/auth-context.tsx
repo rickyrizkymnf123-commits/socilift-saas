@@ -4,6 +4,15 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Profile, Organization, Brand, OrgRole } from '@/types/database';
 import { useRouter } from 'next/navigation';
 
+export interface ImpersonatedUser {
+  id: string;
+  email: string;
+  display_name?: string | null;
+  role: OrgRole;
+  tier?: string;
+  status?: string;
+}
+
 interface AuthContextType {
   user: Profile | null;
   currentOrg: Organization | null;
@@ -13,6 +22,10 @@ interface AuthContextType {
   isLoading: boolean;
   canEdit: boolean;
   canApprove: boolean;
+  impersonatedUser: ImpersonatedUser | null;
+  isImpersonating: boolean;
+  startImpersonation: (user: ImpersonatedUser) => void;
+  stopImpersonation: () => void;
   switchBrand: (brandId: string) => void;
   switchRole: (role: OrgRole) => void;
   login: (email: string) => Promise<boolean>;
@@ -29,6 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentBrand, setCurrentBrand] = useState<Brand | null>(null);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [role, setRole] = useState<OrgRole>('dashboard_admin');
+  const [originalRole, setOriginalRole] = useState<OrgRole>('dashboard_admin');
+  const [impersonatedUser, setImpersonatedUser] = useState<ImpersonatedUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchInitialData = async () => {
@@ -46,6 +61,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         if (data.role) {
           setRole(data.role);
+          setOriginalRole(data.role);
+        }
+
+        // Check for active impersonation in localStorage
+        if (typeof window !== 'undefined') {
+          const savedImpersonation = localStorage.getItem('socilift_impersonate_user');
+          if (savedImpersonation) {
+            try {
+              const parsed: ImpersonatedUser = JSON.parse(savedImpersonation);
+              setImpersonatedUser(parsed);
+              setRole(parsed.role);
+            } catch (err) {
+              console.error(err);
+            }
+          }
         }
       }
     } catch (e) {
@@ -58,6 +88,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     fetchInitialData();
   }, []);
+
+  const startImpersonation = (targetUser: ImpersonatedUser) => {
+    setImpersonatedUser(targetUser);
+    setRole(targetUser.role);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('socilift_impersonate_user', JSON.stringify(targetUser));
+    }
+    router.push('/dashboard');
+  };
+
+  const stopImpersonation = () => {
+    setImpersonatedUser(null);
+    setRole(originalRole);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('socilift_impersonate_user');
+    }
+  };
 
   const switchBrand = (brandId: string) => {
     const target = brands.find(b => b.id === brandId);
@@ -95,8 +142,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('socilift_impersonate_user');
+    }
     fetch('/api/auth/logout', { method: 'POST' }).then(() => {
       setUser(null);
+      setImpersonatedUser(null);
       router.push('/login');
     });
   };
@@ -126,6 +177,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         canEdit,
         canApprove,
+        impersonatedUser,
+        isImpersonating: impersonatedUser !== null,
+        startImpersonation,
+        stopImpersonation,
         switchBrand,
         switchRole,
         login,

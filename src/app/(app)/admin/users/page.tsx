@@ -18,7 +18,8 @@ import {
   Edit2,
   Zap,
   X,
-  Crown
+  Crown,
+  Eye
 } from 'lucide-react';
 import { 
   SubscriptionTier, 
@@ -26,6 +27,7 @@ import {
   OrgRole,
   UserAdminListItem 
 } from '@/types/database';
+import { useAuth } from '@/lib/auth/auth-context';
 
 interface AdminStats {
   total: number;
@@ -36,6 +38,7 @@ interface AdminStats {
 }
 
 export default function AdminUsersPage() {
+  const { startImpersonation } = useAuth();
   const [users, setUsers] = useState<UserAdminListItem[]>([]);
   const [stats, setStats] = useState<AdminStats>({
     total: 0,
@@ -459,6 +462,98 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
+      {/* Quick Impersonation / Fitur Intip Presets Bar */}
+      <div className="bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 rounded-2xl p-4 mb-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shrink-0 shadow-xs">
+            <Eye className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black text-amber-950 dark:text-amber-200">
+                Fitur Intip Tampilan (Live View-as User)
+              </span>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">
+                Simulasi Real-time
+              </span>
+            </div>
+            <p className="text-[11px] text-amber-800/80 dark:text-amber-300/80 font-medium mt-0.5">
+              Klik tombol intip untuk melihat tampilan antarmuka, batasan menu, dan fitur persis seperti yang dilihat oleh user:
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          <button
+            onClick={() =>
+              startImpersonation({
+                id: 'demo-creator-pro',
+                email: 'creator@socilift.local',
+                display_name: 'Creator Pro Demo',
+                role: 'creator',
+                tier: 'pro',
+                status: 'active',
+              })
+            }
+            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-amber-300/60 dark:border-amber-700/60 text-xs font-bold transition shadow-2xs flex items-center gap-1.5"
+          >
+            <span>🎨</span>
+            <span>Intip Creator Pro</span>
+          </button>
+
+          <button
+            onClick={() =>
+              startImpersonation({
+                id: 'demo-manager',
+                email: 'manager@socilift.local',
+                display_name: 'Manager Demo',
+                role: 'manager',
+                tier: 'agency',
+                status: 'active',
+              })
+            }
+            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-amber-300/60 dark:border-amber-700/60 text-xs font-bold transition shadow-2xs flex items-center gap-1.5"
+          >
+            <span>💼</span>
+            <span>Intip Manager</span>
+          </button>
+
+          <button
+            onClick={() =>
+              startImpersonation({
+                id: 'demo-trial',
+                email: 'trial.user@socilift.local',
+                display_name: 'Trial User Demo',
+                role: 'creator',
+                tier: 'starter',
+                status: 'trial',
+              })
+            }
+            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-amber-300/60 dark:border-amber-700/60 text-xs font-bold transition shadow-2xs flex items-center gap-1.5"
+          >
+            <span>⏳</span>
+            <span>Intip User Trial</span>
+          </button>
+
+          <button
+            onClick={() =>
+              startImpersonation({
+                id: 'demo-expired',
+                email: 'expired.user@socilift.local',
+                display_name: 'Expired User Demo',
+                role: 'view_only',
+                tier: 'free',
+                status: 'expired',
+              })
+            }
+            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-amber-300/60 dark:border-amber-700/60 text-xs font-bold transition shadow-2xs flex items-center gap-1.5"
+          >
+            <span>🚫</span>
+            <span>Intip User Expired</span>
+          </button>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
@@ -703,6 +798,25 @@ export default function AdminUsersPage() {
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Intip Akun (View as User) */}
+                          <button
+                            onClick={() => {
+                              startImpersonation({
+                                id: user.id,
+                                email: user.email,
+                                display_name: user.display_name,
+                                role: user.role,
+                                tier: user.subscription?.tier || 'free',
+                                status: user.subscription?.status || 'active',
+                              });
+                            }}
+                            title={`Intip Tampilan Akun ${user.email}`}
+                            className="p-1.5 text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 rounded-lg transition-colors text-xs font-bold flex items-center gap-1 shadow-2xs border border-amber-300/40 dark:border-amber-700/40"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                            <span className="hidden sm:inline">Intip</span>
+                          </button>
+
                           {/* Quick Extend +30d */}
                           {!user.subscription?.is_free_access && (
                             <button
