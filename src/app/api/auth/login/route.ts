@@ -6,65 +6,39 @@ export async function POST(req: Request) {
   try {
     const { email } = await req.json();
     if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Email wajib diisi' }, { status: 400 });
     }
 
-    let user = dbStore.getProfileByEmail(email);
-    const nowIso = new Date().toISOString();
-    const isAdminUser = email.toLowerCase() === 'rickyrizkymnf123@gmail.com';
+    const cleanEmail = email.trim().toLowerCase();
+    const isAdminUser = cleanEmail === 'rickyrizkymnf123@gmail.com';
+    let user = dbStore.getProfileByEmail(cleanEmail);
 
     if (!user) {
-      // Auto register with dedicated isolated workspace
-      const newUserId = 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-      user = dbStore.createProfile({
-        id: newUserId,
-        email: email.toLowerCase(),
-        display_name: email.split('@')[0],
-        created_at: nowIso,
-      });
+      // If user doesn't exist, check if it's admin or prompt to register
+      if (isAdminUser) {
+        const nowIso = new Date().toISOString();
+        user = dbStore.createProfile({
+          id: 'a0000000-0000-0000-0000-000000000001',
+          email: cleanEmail,
+          display_name: 'Ricky Rizky (Admin)',
+          is_approved: true,
+          created_at: nowIso,
+        });
+      } else {
+        return NextResponse.json({
+          error: 'Akun belum terdaftar. Silakan lakukan pendaftaran terlebih dahulu.',
+          not_found: true
+        }, { status: 404 });
+      }
+    }
 
-      const userOrg = {
-        id: 'org-' + user.id,
-        name: `${user.display_name || email.split('@')[0]}'s Workspace`,
-        owner_id: user.id,
-        created_at: nowIso,
-      };
-      dbStore.createOrganization(userOrg);
-
-      dbStore.addMember({
-        org_id: userOrg.id,
-        user_id: user.id,
-        role: isAdminUser ? 'dashboard_admin' : 'creator',
-        created_at: nowIso,
-      });
-
-      // Dedicated isolated brand for this user
-      dbStore.createBrand({
-        id: 'brand-' + user.id,
-        org_id: userOrg.id,
-        name: `${user.display_name || email.split('@')[0]} Studio`,
-        color: '#3B82F6',
-        pillars: ['Edukasi & Tips', 'Inspirasi', 'Promosi Produk'],
-        funnels: ['TOFU (Top of Funnel)', 'MOFU (Middle of Funnel)', 'BOFU (Bottom of Funnel)'],
-        objectives: ['Brand Awareness', 'Engagement', 'Sales'],
-        details: {
-          niche: 'Kreator Konten',
-          toneOfVoice: 'Casual & Menarik',
-          targetAudience: 'Audiens Media Sosial',
-        },
-        created_by: user.id,
-        created_at: nowIso,
-      });
-
-      // Default subscription
-      dbStore.saveUserSubscription(user.id, {
-        tier: isAdminUser ? 'pro' : 'basic',
-        status: 'active',
-        is_free_access: isAdminUser,
-        start_date: nowIso,
-        end_date: new Date(Date.now() + 30 * 86400000).toISOString(),
-        notes: isAdminUser ? 'Super Admin' : 'Free Basic User',
-      });
+    // Check if user is approved by admin
+    if (user.is_approved === false && !isAdminUser) {
+      return NextResponse.json({
+        error: 'Sorry, kamu masih belum di-approve, menunggu persetujuan dari admin',
+        is_approved: false,
+        email: user.email
+      }, { status: 403 });
     }
 
     const cookieStore = await cookies();

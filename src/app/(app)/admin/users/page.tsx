@@ -19,7 +19,11 @@ import {
   Zap,
   X,
   Crown,
-  Eye
+  Eye,
+  Check,
+  Phone,
+  Save,
+  MessageSquare
 } from 'lucide-react';
 import { 
   SubscriptionTier, 
@@ -35,6 +39,7 @@ interface AdminStats {
   trial: number;
   expired: number;
   admins: number;
+  pending_approval?: number;
 }
 
 export default function AdminUsersPage() {
@@ -45,7 +50,8 @@ export default function AdminUsersPage() {
     active: 0,
     trial: 0,
     expired: 0,
-    admins: 0
+    admins: 0,
+    pending_approval: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,9 +59,17 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [tierFilter, setTierFilter] = useState<string>('all');
   
+  // WhatsApp Settings
+  const [adminWhatsapp, setAdminWhatsapp] = useState('');
+  const [isSavingWhatsapp, setIsSavingWhatsapp] = useState(false);
+
   // Selection
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   
+  // Approving individual user
+  const [approvingUserId, setApprovingUserId] = useState<string | null>(null);
+  const [isBulkApproving, setIsBulkApproving] = useState(false);
+
   // Modals state
   const [isBulkInviteOpen, setIsBulkInviteOpen] = useState(false);
   const [isBulkSubOpen, setIsBulkSubOpen] = useState(false);
@@ -66,6 +80,7 @@ export default function AdminUsersPage() {
     email: string;
     display_name: string;
     role: OrgRole;
+    is_approved: boolean;
     tier: SubscriptionTier;
     status: SubscriptionStatus;
     is_free_access: boolean;
@@ -98,6 +113,45 @@ export default function AdminUsersPage() {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
+  // Fetch Admin Settings
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/admin/settings');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.admin_whatsapp) {
+          setAdminWhatsapp(data.admin_whatsapp);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch settings:', err);
+    }
+  };
+
+  // Save WhatsApp Setting
+  const handleSaveWhatsapp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminWhatsapp.trim()) {
+      showToast('Nomor WhatsApp tidak boleh kosong', 'error');
+      return;
+    }
+    try {
+      setIsSavingWhatsapp(true);
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ admin_whatsapp: adminWhatsapp.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal menyimpan');
+      showToast('Nomor WhatsApp Admin berhasil diperbarui!');
+    } catch (err: any) {
+      showToast(err.message, 'error');
+    } finally {
+      setIsSavingWhatsapp(false);
+    }
+  };
+
   // Fetch Users
   const fetchUsers = async () => {
     try {
@@ -105,7 +159,7 @@ export default function AdminUsersPage() {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
       if (roleFilter !== 'all') params.append('role', roleFilter);
-      if (statusFilter !== 'all') params.append('subscription', statusFilter);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
       if (tierFilter !== 'all') params.append('tier', tierFilter);
 
       const res = await fetch('/api/admin/users?' + params.toString());
@@ -121,6 +175,7 @@ export default function AdminUsersPage() {
   };
 
   useEffect(() => {
+    fetchSettings();
     fetchUsers();
   }, [roleFilter, statusFilter, tierFilter]);
 
@@ -148,6 +203,51 @@ export default function AdminUsersPage() {
   };
 
   const isAllSelected = users.length > 0 && selectedIds.length === users.length;
+
+  // 1-Click Approve Single User
+  const handleApproveUser = async (userId: string, email: string) => {
+    try {
+      setApprovingUserId(userId);
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_approved: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal menyetujui');
+      showToast(`Pengguna ${email} berhasil di-ACC & disetujui! 🎉`);
+      fetchUsers();
+    } catch (err: any) {
+      showToast(err.message, 'error');
+    } finally {
+      setApprovingUserId(null);
+    }
+  };
+
+  // Bulk Approve Selected Users
+  const handleBulkApprove = async () => {
+    const targetUsers = users.filter(u => selectedIds.includes(u.id) && !u.is_approved);
+    if (targetUsers.length === 0) {
+      showToast('Tidak ada user terpilih yang perlu di-ACC', 'error');
+      return;
+    }
+    try {
+      setIsBulkApproving(true);
+      const res = await fetch('/api/admin/users/bulk-approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIds: targetUsers.map(u => u.id) }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal ACC massal');
+      showToast(`Berhasil menyetujui (ACC) ${data.approvedCount || targetUsers.length} pengguna! 🎉`);
+      fetchUsers();
+    } catch (err: any) {
+      showToast(err.message, 'error');
+    } finally {
+      setIsBulkApproving(false);
+    }
+  };
 
   // Single Quick Extend
   const handleQuickExtend = async (userId: string, days: number = 30) => {
@@ -276,6 +376,7 @@ export default function AdminUsersPage() {
         body: JSON.stringify({
           name: activeEditingUser.display_name,
           role: activeEditingUser.role,
+          is_approved: activeEditingUser.is_approved,
           subscription: {
             tier: activeEditingUser.tier,
             status: activeEditingUser.status,
@@ -335,22 +436,31 @@ export default function AdminUsersPage() {
   // Tier Colors (Basic vs Pro)
   const getTierBadge = (tier?: string) => {
     const normalized = (tier || 'basic').toLowerCase();
-    if (normalized === 'pro' || normalized === 'enterprise' || normalized === 'agency') {
+    if (normalized === 'pro') {
       return 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border-indigo-500/30';
     }
     return 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30';
   };
 
   // Status Colors
-  const getStatusBadge = (status?: SubscriptionStatus, isPendingInvite?: boolean) => {
-    if (isPendingInvite) {
+  const getStatusBadge = (user: UserAdminListItem) => {
+    if (!user.is_approved) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+          <Clock className="w-3 h-3 animate-pulse" />
+          Menunggu ACC
+        </span>
+      );
+    }
+    if (!user.is_registered) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
           <Clock className="w-3 h-3" />
           Pending Invite
         </span>
       );
     }
+    const status = user.subscription?.status;
     switch (status) {
       case 'active':
         return (
@@ -383,7 +493,7 @@ export default function AdminUsersPage() {
       default:
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">
-            Free / Starter
+            Basic Active
           </span>
         );
     }
@@ -404,6 +514,8 @@ export default function AdminUsersPage() {
     }
   };
 
+  const pendingUsersCount = stats.pending_approval || users.filter(u => !u.is_approved).length;
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 lg:p-8 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Toast Notification */}
@@ -419,16 +531,16 @@ export default function AdminUsersPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <div className="p-2.5 bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl">
               <Crown className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Kelola Langganan & Akses Pengguna</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Admin Management & ACC Pengguna</h1>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                Atur durasi masa aktif langganan, paket tier (Pro/Enterprise), akses gratis (Lifetime), perpanjangan massal, dan undangan user.
+                Persetujuan registrasi pengguna baru (ACC), pengaturan WhatsApp aktivasi, paket tier (Basic/Pro), dan masa aktif langganan.
               </p>
             </div>
           </div>
@@ -452,6 +564,43 @@ export default function AdminUsersPage() {
             <span>Undang Massal</span>
           </button>
         </div>
+      </div>
+
+      {/* Admin WhatsApp Settings Card */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 mb-8 shadow-sm">
+        <form onSubmit={handleSaveWhatsapp} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <Phone className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                Nomor WhatsApp Admin (Aktivasi Akun User)
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                User yang baru mendaftar akan diarahkan untuk menghubungi nomor ini di halaman Pending Approval.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <input
+              type="text"
+              value={adminWhatsapp}
+              onChange={(e) => setAdminWhatsapp(e.target.value)}
+              placeholder="Contoh: 6281234567890"
+              className="w-full md:w-64 px-3.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+            <button
+              type="submit"
+              disabled={isSavingWhatsapp}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 whitespace-nowrap"
+            >
+              {isSavingWhatsapp ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              <span>Simpan WA</span>
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Quick Impersonation / Fitur Intip Presets Bar */}
@@ -496,35 +645,18 @@ export default function AdminUsersPage() {
           <button
             onClick={() =>
               startImpersonation({
-                id: 'demo-manager',
-                email: 'manager@socilift.local',
-                display_name: 'Manager Demo',
-                role: 'manager',
-                tier: 'agency',
+                id: 'demo-trial',
+                email: 'trial.user@socilift.local',
+                display_name: 'Basic User Demo',
+                role: 'creator',
+                tier: 'basic',
                 status: 'active',
               })
             }
             className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-amber-300/60 dark:border-amber-700/60 text-xs font-bold transition shadow-2xs flex items-center gap-1.5"
           >
-            <span>💼</span>
-            <span>Intip Manager</span>
-          </button>
-
-          <button
-            onClick={() =>
-              startImpersonation({
-                id: 'demo-trial',
-                email: 'trial.user@socilift.local',
-                display_name: 'Trial User Demo',
-                role: 'creator',
-                tier: 'starter',
-                status: 'trial',
-              })
-            }
-            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-amber-300/60 dark:border-amber-700/60 text-xs font-bold transition shadow-2xs flex items-center gap-1.5"
-          >
-            <span>⏳</span>
-            <span>Intip User Trial</span>
+            <span>👤</span>
+            <span>Intip User Basic</span>
           </button>
 
           <button
@@ -534,7 +666,7 @@ export default function AdminUsersPage() {
                 email: 'expired.user@socilift.local',
                 display_name: 'Expired User Demo',
                 role: 'view_only',
-                tier: 'free',
+                tier: 'basic',
                 status: 'expired',
               })
             }
@@ -547,7 +679,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Pengguna</span>
@@ -557,7 +689,28 @@ export default function AdminUsersPage() {
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-bold">{stats.total}</span>
-            <span className="text-xs text-slate-500">user terdaftar</span>
+            <span className="text-xs text-slate-500">user</span>
+          </div>
+        </div>
+
+        {/* Pending ACC Highlight Card */}
+        <div 
+          onClick={() => setStatusFilter(statusFilter === 'pending_approval' ? 'all' : 'pending_approval')}
+          className={`p-5 rounded-2xl border transition-all cursor-pointer shadow-sm ${
+            statusFilter === 'pending_approval'
+              ? 'bg-amber-500/20 border-amber-500 dark:bg-amber-950/50'
+              : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-amber-400'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Menunggu ACC</span>
+            <div className="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg">
+              <Clock className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-amber-600 dark:text-amber-400">{pendingUsersCount}</span>
+            <span className="text-xs text-amber-600/80 dark:text-amber-400/80 font-semibold">perlu persetujuan</span>
           </div>
         </div>
 
@@ -578,12 +731,12 @@ export default function AdminUsersPage() {
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Trial & Pending</span>
             <div className="p-2 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-lg">
-              <Clock className="w-4 h-4" />
+              <Zap className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.trial}</span>
-            <span className="text-xs text-slate-500">masa uji coba / invite</span>
+            <span className="text-xs text-slate-500">masa trial</span>
           </div>
         </div>
 
@@ -596,7 +749,7 @@ export default function AdminUsersPage() {
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-bold text-rose-600 dark:text-rose-400">{stats.expired}</span>
-            <span className="text-xs text-slate-500">perlu perpanjangan</span>
+            <span className="text-xs text-slate-500">expired</span>
           </div>
         </div>
       </div>
@@ -623,6 +776,19 @@ export default function AdminUsersPage() {
               <span className="text-xs font-medium text-slate-500">Filter:</span>
             </div>
 
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="all">Semua Status</option>
+              <option value="pending_approval">⏳ Menunggu ACC ({pendingUsersCount})</option>
+              <option value="approved">✓ Sudah Disetujui</option>
+              <option value="registered">Terdaftar</option>
+              <option value="pending">Pending Invite</option>
+            </select>
+
             {/* Role Filter */}
             <select
               value={roleFilter}
@@ -636,19 +802,6 @@ export default function AdminUsersPage() {
               <option value="view_only">View Only</option>
             </select>
 
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="all">Semua Status</option>
-              <option value="active">Aktif</option>
-              <option value="trial">Trial</option>
-              <option value="expired">Kedaluwarsa</option>
-              <option value="lifetime">Lifetime</option>
-            </select>
-
             {/* Tier Filter */}
             <select
               value={tierFilter}
@@ -656,7 +809,7 @@ export default function AdminUsersPage() {
               className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="all">Semua Paket</option>
-              <option value="basic">Basic</option>
+              <option value="basic">Basic (Gratis)</option>
               <option value="pro">Pro</option>
             </select>
           </div>
@@ -680,7 +833,7 @@ export default function AdminUsersPage() {
                 <th className="py-4 px-4">Pengguna</th>
                 <th className="py-4 px-4">Role</th>
                 <th className="py-4 px-4">Paket Langganan</th>
-                <th className="py-4 px-4">Status</th>
+                <th className="py-4 px-4">Status Akun</th>
                 <th className="py-4 px-4">Masa Berlaku</th>
                 <th className="py-4 px-4 text-right">Aksi</th>
               </tr>
@@ -708,14 +861,14 @@ export default function AdminUsersPage() {
                 users.map((user) => {
                   const dateInfo = formatDateDisplay(user.subscription?.end_date, user.subscription?.is_free_access);
                   const isSelected = selectedIds.includes(user.id);
-                  const isPendingInvite = !user.is_registered;
+                  const isPendingAcc = !user.is_approved;
 
                   return (
                     <tr 
                       key={user.id}
                       className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${
-                        isSelected ? 'bg-indigo-50/50 dark:bg-indigo-950/20' : ''
-                      }`}
+                        isPendingAcc ? 'bg-amber-500/5 dark:bg-amber-950/15' : ''
+                      } ${isSelected ? 'bg-indigo-50/50 dark:bg-indigo-950/20' : ''}`}
                     >
                       {/* Checkbox */}
                       <td className="py-3.5 px-4 text-center">
@@ -730,7 +883,11 @@ export default function AdminUsersPage() {
                       {/* User Info */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0 ${
+                            isPendingAcc 
+                              ? 'bg-amber-500 text-slate-950' 
+                              : 'bg-gradient-to-br from-indigo-500 to-purple-600'
+                          }`}>
                             {user.display_name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
                           </div>
                           <div className="min-w-0">
@@ -763,13 +920,13 @@ export default function AdminUsersPage() {
                       <td className="py-3.5 px-4">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold capitalize border ${getTierBadge(user.subscription?.tier)}`}>
                           <Sparkles className="w-3 h-3" />
-                          {user.subscription?.tier || 'free'}
+                          {user.subscription?.tier || 'basic'}
                         </span>
                       </td>
 
                       {/* Status */}
                       <td className="py-3.5 px-4">
-                        {getStatusBadge(user.subscription?.status, isPendingInvite)}
+                        {getStatusBadge(user)}
                       </td>
 
                       {/* Period / End Date */}
@@ -787,6 +944,23 @@ export default function AdminUsersPage() {
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* 1-Click ACC Button if not approved */}
+                          {isPendingAcc && (
+                            <button
+                              onClick={() => handleApproveUser(user.id, user.email)}
+                              disabled={approvingUserId === user.id}
+                              title="Setujui (ACC) Akun Ini"
+                              className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-600/20 disabled:opacity-50"
+                            >
+                              {approvingUserId === user.id ? (
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                              )}
+                              <span>ACC</span>
+                            </button>
+                          )}
+
                           {/* Intip Akun (View as User) */}
                           <button
                             onClick={() => {
@@ -795,7 +969,7 @@ export default function AdminUsersPage() {
                                 email: user.email,
                                 display_name: user.display_name,
                                 role: user.role,
-                                tier: user.subscription?.tier || 'free',
+                                tier: user.subscription?.tier || 'basic',
                                 status: user.subscription?.status || 'active',
                               });
                             }}
@@ -826,6 +1000,7 @@ export default function AdminUsersPage() {
                                 email: user.email,
                                 display_name: user.display_name || '',
                                 role: user.role,
+                                is_approved: user.is_approved,
                                 tier: user.subscription?.tier || 'pro',
                                 status: user.subscription?.status || 'active',
                                 is_free_access: Boolean(user.subscription?.is_free_access),
@@ -870,6 +1045,18 @@ export default function AdminUsersPage() {
           </span>
 
           <div className="h-4 w-px bg-slate-700" />
+
+          {/* Bulk ACC Button if any unapproved selected */}
+          {users.some(u => selectedIds.includes(u.id) && !u.is_approved) && (
+            <button
+              onClick={handleBulkApprove}
+              disabled={isBulkApproving}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition-all shadow-sm disabled:opacity-50"
+            >
+              {isBulkApproving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              <span>ACC Terpilih</span>
+            </button>
+          )}
 
           {/* Bulk Manage Subscription */}
           <button
@@ -1191,7 +1378,7 @@ export default function AdminUsersPage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="Contoh: Promo Flash Sale / Upgrade Massal Agency"
+                  placeholder="Contoh: Upgrade Massal Agency"
                   value={bulkSubNotes}
                   onChange={(e) => setBulkSubNotes(e.target.value)}
                   className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm"
@@ -1274,6 +1461,22 @@ export default function AdminUsersPage() {
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Status Persetujuan (ACC)
+                  </label>
+                  <select
+                    value={activeEditingUser.is_approved ? 'true' : 'false'}
+                    onChange={(e) => setActiveEditingUser({ ...activeEditingUser, is_approved: e.target.value === 'true' })}
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-semibold"
+                  >
+                    <option value="true">✓ Sudah Disetujui (ACC)</option>
+                    <option value="false">⏳ Menunggu Persetujuan</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
                     Paket Tier
                   </label>
                   <select
@@ -1285,9 +1488,7 @@ export default function AdminUsersPage() {
                     <option value="pro">Pro</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
                     Status Langganan
@@ -1303,19 +1504,19 @@ export default function AdminUsersPage() {
                     <option value="cancelled">Cancelled</option>
                   </select>
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                    Kedaluwarsa Sampai
-                  </label>
-                  <input
-                    type="date"
-                    disabled={activeEditingUser.is_free_access}
-                    value={activeEditingUser.end_date ? activeEditingUser.end_date.split('T')[0] : ''}
-                    onChange={(e) => setActiveEditingUser({ ...activeEditingUser, end_date: e.target.value ? new Date(e.target.value).toISOString() : '' })}
-                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm disabled:opacity-50"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                  Kedaluwarsa Sampai
+                </label>
+                <input
+                  type="date"
+                  disabled={activeEditingUser.is_free_access}
+                  value={activeEditingUser.end_date ? activeEditingUser.end_date.split('T')[0] : ''}
+                  onChange={(e) => setActiveEditingUser({ ...activeEditingUser, end_date: e.target.value ? new Date(e.target.value).toISOString() : '' })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm disabled:opacity-50"
+                />
               </div>
 
               <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl">

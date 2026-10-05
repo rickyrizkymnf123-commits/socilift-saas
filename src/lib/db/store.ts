@@ -27,6 +27,7 @@ import {
   UserSubscription,
   UserInvitation,
   UserAdminListItem,
+  AdminSetting,
 } from '@/types/database';
 
 export interface DatabaseState {
@@ -50,6 +51,7 @@ export interface DatabaseState {
   ai_chat_messages: AIChatMessage[];
   ai_usage_logs: AIUsageLog[];
   gemini_settings: GeminiSettings[];
+  admin_settings?: AdminSetting[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -123,6 +125,7 @@ function getInitialData(): DatabaseState {
     id: 'a0000000-0000-0000-0000-000000000001',
     email: 'rickyrizkymnf123@gmail.com',
     display_name: 'Ricky Rizky (Admin)',
+    is_approved: true,
     created_at: isoNow,
   };
 
@@ -130,6 +133,7 @@ function getInitialData(): DatabaseState {
     id: 'c0000000-0000-0000-0000-000000000001',
     email: 'creator@socilift.local',
     display_name: 'Creator Pro',
+    is_approved: true,
     created_at: isoNow,
   };
 
@@ -447,6 +451,9 @@ function getInitialData(): DatabaseState {
     ai_chat_messages: [],
     ai_usage_logs: [],
     gemini_settings: [sampleGeminiSettings],
+    admin_settings: [
+      { key: 'admin_whatsapp', value: '6281234567890', updated_at: isoNow }
+    ],
   };
 }
 
@@ -470,6 +477,10 @@ class LocalDBStore {
         if (!parsed.user_invitations) {
           const initial = getInitialData();
           parsed.user_invitations = initial.user_invitations;
+        }
+        if (!parsed.admin_settings) {
+          const initial = getInitialData();
+          parsed.admin_settings = initial.admin_settings;
         }
         return parsed;
       }
@@ -998,6 +1009,7 @@ class LocalDBStore {
       trial: allCombined.filter(u => u.subscription?.status === 'trial' || !u.is_registered).length,
       expired: allCombined.filter(u => u.subscription?.status === 'expired').length,
       admins: allCombined.filter(u => u.role === 'dashboard_admin').length,
+      pending_approval: allCombined.filter(u => u.is_registered && !u.is_approved).length,
     };
 
     // Apply filtering
@@ -1019,6 +1031,8 @@ class LocalDBStore {
     if (options?.status && options.status !== 'all') {
       if (options.status === 'registered') filtered = filtered.filter(u => u.is_registered);
       if (options.status === 'pending') filtered = filtered.filter(u => !u.is_registered);
+      if (options.status === 'pending_approval' || options.status === 'pending_acc') filtered = filtered.filter(u => u.is_registered && !u.is_approved);
+      if (options.status === 'approved') filtered = filtered.filter(u => u.is_registered && u.is_approved);
     }
 
     if (options?.subscription && options.subscription !== 'all') {
@@ -1211,8 +1225,52 @@ class LocalDBStore {
     return { profile };
   }
 
+  approveUser(userId: string, isApproved = true) {
+    return this.updateAdminUser(userId, { is_approved: isApproved });
+  }
+
+  bulkApproveUsers(userIds: string[]): { success: boolean; approvedCount: number } {
+    let approvedCount = 0;
+    const idSet = new Set(userIds);
+    this.data.profiles.forEach(p => {
+      if (idSet.has(p.id) && !p.is_approved) {
+        p.is_approved = true;
+        approvedCount++;
+      }
+    });
+    this.persist();
+    return { success: true, approvedCount };
+  }
+
   deleteAdminUser(userId: string) {
     return this.bulkDeleteUsers([userId]);
+  }
+
+  // --- Admin Settings (e.g. WhatsApp contact) ---
+  getAdminSettings(): AdminSetting[] {
+    return this.data.admin_settings || [];
+  }
+
+  getAdminSetting(key: string, defaultValue = ''): string {
+    const found = (this.data.admin_settings || []).find(s => s.key === key);
+    return found ? found.value : defaultValue;
+  }
+
+  setAdminSetting(key: string, value: string): AdminSetting {
+    if (!this.data.admin_settings) this.data.admin_settings = [];
+    const idx = this.data.admin_settings.findIndex(s => s.key === key);
+    const nowIso = new Date().toISOString();
+    if (idx !== -1) {
+      this.data.admin_settings[idx].value = value;
+      this.data.admin_settings[idx].updated_at = nowIso;
+      this.persist();
+      return this.data.admin_settings[idx];
+    } else {
+      const newSetting: AdminSetting = { key, value, updated_at: nowIso };
+      this.data.admin_settings.push(newSetting);
+      this.persist();
+      return newSetting;
+    }
   }
 }
 

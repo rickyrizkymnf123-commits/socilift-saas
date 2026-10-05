@@ -361,3 +361,9 @@ export interface GeminiSettings {
   last_tested_at?: string | null;
   updated_at: string;
 }
+
+export interface AdminSetting {
+  key: string;
+  value: string;
+  updated_at?: string;
+}
