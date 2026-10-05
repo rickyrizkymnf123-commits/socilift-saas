@@ -3,15 +3,15 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/auth-context';
-import { Shield, User, ArrowRight, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { SociliftIcon } from '@/components/ui/socilift-logo';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
-  const [email, setEmail] = useState('rickyrizkymnf123@gmail.com');
-  const [password, setPassword] = useState('Permatasari11');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -41,7 +41,7 @@ export default function LoginPage() {
         if (res.status === 403 || data.is_approved === false) {
           setError('Sorry, kamu masih belum di-approve, menunggu persetujuan dari admin');
           setIsPendingApproval(true);
-          // Redirect to pending approval page after a short moment or immediately
+          // Redirect to pending approval page
           setTimeout(() => {
             router.push(`/pending-approval?email=${encodeURIComponent(email.trim())}`);
           }, 1500);
@@ -57,43 +57,6 @@ export default function LoginPage() {
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan pada server');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const quickLogin = async (targetEmail: string, targetPass: string = 'password') => {
-    setEmail(targetEmail);
-    setPassword(targetPass);
-    setLoading(true);
-    setError('');
-    setIsPendingApproval(false);
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: targetEmail, password: targetPass }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (res.status === 403 || data.is_approved === false) {
-          setError('Sorry, kamu masih belum di-approve, menunggu persetujuan dari admin');
-          setIsPendingApproval(true);
-          setTimeout(() => {
-            router.push(`/pending-approval?email=${encodeURIComponent(targetEmail)}`);
-          }, 1500);
-          return;
-        }
-        setError(data.error || 'Login gagal.');
-        return;
-      }
-
-      await login(targetEmail);
-      router.push('/dashboard');
-    } catch (err) {
-      setError('Login gagal.');
     } finally {
       setLoading(false);
     }
@@ -186,7 +149,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition shadow-lg shadow-blue-500/25 disabled:opacity-50 text-sm mt-2"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition shadow-lg shadow-blue-500/25 disabled:opacity-50 text-sm mt-2 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -207,30 +170,6 @@ export default function LoginPage() {
             <Link href="/signup" className="text-blue-400 hover:text-blue-300 font-semibold hover:underline">
               Daftar Sekarang
             </Link>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-slate-800">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3 text-center">
-              Quick Login Demo
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => quickLogin('rickyrizkymnf123@gmail.com', 'Permatasari11')}
-                className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-blue-500/30 bg-blue-950/40 hover:bg-blue-900/50 text-blue-400 text-xs font-bold transition"
-              >
-                <Shield className="w-4 h-4 text-blue-400" />
-                Admin (Ricky)
-              </button>
-              <button
-                type="button"
-                onClick={() => quickLogin('creator@socilift.local', 'password')}
-                className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-300 text-xs font-bold transition"
-              >
-                <User className="w-4 h-4 text-slate-400" />
-                Creator Pro
-              </button>
-            </div>
           </div>
         </div>
       </div>

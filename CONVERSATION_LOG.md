@@ -247,6 +247,25 @@
       - `npx tsc --noEmit` lolos 0 errors.
       - `npm run build` sukses tanpa error.
       - Terdeploy dan live di `https://socilift-saas.vercel.app`.
-
-
-
+31. **Implementasi Sistem Approval Registrasi & Admin ACC Management ala ProfitLab (06 Oktober 2026)**:
+    - **Alur Pendaftaran & Persetujuan (Approval Workflow)**:
+      - Setiap pengguna baru yang mendaftar via `/signup` akan memiliki status `is_approved: false`.
+      - Saat pengguna yang belum di-ACC mencoba login via `/login`, login diblokir dengan status HTTP 403 dan menampilkan pesan:
+        *"Sorry, kamu masih belum di-approve, menunggu persetujuan dari admin"*, serta otomatis diarahkan ke `/pending-approval`.
+      - Super Admin (`rickyrizkymnf123@gmail.com`) selalu berstatus `is_approved: true` secara otomatis dengan paket Pro Lifetime.
+    - **Halaman Khusus Pending Approval (`/pending-approval`)**:
+      - Dibuat halaman `src/app/(auth)/pending-approval/page.tsx` dengan desain modern dan futuristik.
+      - Menampilkan badge "Menunggu Persetujuan", kartu instruksi aktivasi, email terdaftar, tombol 1-klik "Hubungi Admin via WhatsApp" (menuju nomor WhatsApp admin yang dinamis), dan tombol keluar / kembali ke login.
+    - **Redesain Halaman Login & Signup (`/login`, `/signup`)**:
+      - Form pendaftaran `/signup` mengumpulkan Nama Lengkap, Email, dan Password, lalu langsung mengarahkan ke halaman `/pending-approval`.
+      - Form login `/login` menangani status pending approval dengan alert amber dan link langsung ke halaman WhatsApp persetujuan.
+    - **Pusat Admin Management & 1-Click ACC (`/admin/users`)**:
+      - Kartu konfigurasi nomor WhatsApp admin yang dapat disimpan secara langsung.
+      - Filter cepat dan kartu statistik khusus **"Menunggu ACC"** dengan indikator jumlah user yang menunggu persetujuan.
+      - Tombol **[ACC]** (Checkmark hijau) pada setiap baris user yang belum disetujui untuk mengaktifkan akun dalam 1 klik.
+      - Tombol **[ACC Terpilih]** pada floating bar untuk menyetujui banyak user sekaligus (Bulk ACC).
+    - **Verifikasi & Sinkronisasi Produksi**:
+      - `npx tsc --noEmit` lolos 0 errors.
+      - `npm run build` sukses mengompilasi seluruh rute statis & dinamis.
+      - Git commit `cee2665` dipush ke branch `main`.
+      - Terdeploy ke Vercel dan aktif di domain live `https://socilift-saas.vercel.app`.

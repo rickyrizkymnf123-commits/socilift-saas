@@ -22,10 +22,7 @@ import {
   Sparkles,
   ShieldCheck,
   UserCheck,
-  Users,
   Crown,
-  Sun,
-  Moon,
   Eye,
 } from 'lucide-react';
 import SociliftLogo from '@/components/ui/socilift-logo';
@@ -39,20 +36,19 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
     currentBrand,
     brands,
     role,
-    originalRole,
     isImpersonating,
     setIsInspectorOpen,
     switchBrand,
-    switchRole,
     logout
   } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
-  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
-  const isAdmin = (role === 'dashboard_admin' || user?.email === 'rickyrizkymnf123@gmail.com') && !isImpersonating;
-  const canInspect = originalRole === 'dashboard_admin' || user?.email === 'rickyrizkymnf123@gmail.com' || isImpersonating;
+  // Strictly check if actual user is Super Admin
+  const isSuperAdminUser = user?.email?.toLowerCase() === 'rickyrizkymnf123@gmail.com';
+  const isAdmin = isSuperAdminUser && !isImpersonating;
+  const canInspect = isSuperAdminUser;
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -84,7 +80,7 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
         </div>
         <button
           onClick={() => setBrandDropdownOpen(!brandDropdownOpen)}
-          className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700/60 text-left transition shadow-xs"
+          className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700/60 text-left transition shadow-xs cursor-pointer"
         >
           <div className="flex items-center gap-2.5 truncate">
             <span
@@ -151,7 +147,7 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
         })}
       </nav>
 
-      {/* Upgrade to Pro Card for Users */}
+      {/* Upgrade to Pro Card for Non-Admin Users */}
       {!isAdmin && (
         <div className="p-3 mx-3 mb-2 rounded-2xl bg-gradient-to-br from-blue-900/40 via-indigo-950/50 to-slate-900 border border-blue-500/30 text-white shadow-md relative overflow-hidden">
           <div className="flex items-center gap-1.5 mb-1">
@@ -171,7 +167,7 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
         </div>
       )}
 
-      {/* User Profile & Role Switcher */}
+      {/* User Profile Footer */}
       <div className="p-3 border-t border-slate-800 bg-slate-950/60 relative">
         {canInspect && (
           <button
@@ -189,59 +185,31 @@ export default function Sidebar({ onOpenNewContent }: { onOpenNewContent?: () =>
         <div className="flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-slate-800/40 transition">
           <div className="flex items-center gap-2.5 truncate">
             <div className="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
-              {user?.display_name?.charAt(0) || user?.email.charAt(0).toUpperCase()}
+              {user?.display_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="truncate">
               <p className="text-xs font-bold text-white truncate">{user?.display_name || user?.email}</p>
-              <button
-                onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-                className="flex items-center gap-1 text-[10px] text-blue-400 hover:text-blue-300 font-semibold"
-              >
-                {role === 'dashboard_admin' ? (
-                  <span className="inline-flex items-center gap-1 text-emerald-400">
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                {isAdmin ? (
+                  <span className="inline-flex items-center gap-1 text-emerald-400 font-semibold">
                     <ShieldCheck className="w-3 h-3" /> Admin
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-slate-300">
+                  <span className="inline-flex items-center gap-1 text-slate-400 font-medium">
                     <UserCheck className="w-3 h-3" /> Creator
                   </span>
                 )}
-                <ChevronDown className="w-2.5 h-2.5" />
-              </button>
+              </div>
             </div>
           </div>
           <button
             onClick={logout}
             title="Keluar"
-            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-red-400 transition"
+            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-red-400 transition cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
           </button>
         </div>
-
-        {roleDropdownOpen && (
-          <div className="absolute bottom-full left-3 right-3 mb-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-1 z-50 text-xs">
-            <div className="px-2 py-1 text-[10px] uppercase font-bold text-slate-400">Ganti Role Test</div>
-            <button
-              onClick={() => {
-                switchRole('dashboard_admin');
-                setRoleDropdownOpen(false);
-              }}
-              className="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-emerald-400 font-bold"
-            >
-              Dashboard Admin (Full Access)
-            </button>
-            <button
-              onClick={() => {
-                switchRole('creator');
-                setRoleDropdownOpen(false);
-              }}
-              className="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-slate-300 font-medium"
-            >
-              Creator (No Approval Rights)
-            </button>
-          </div>
-        )}
       </div>
 
       <UpgradeModal

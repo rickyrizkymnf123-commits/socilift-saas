@@ -67,10 +67,20 @@
   - `Socilift` wordmark dengan cyan accent dot & minimalist luxury `PLUS` pill badge di seluruh layout aplikasi.
 
 ## Production Deployment & Infrastructure (19 Sep 2026)
-- **Live Production URL**: `https://socilift-saas.vercel.app`
-- **GitHub Repo**: `https://github.com/rickyrizkymnf123-commits/socilift-saas` (branch: `main`)
-- **Supabase Project**: `socilift-saas` (`pytmquulcvkkqzsfvlwz`) Region: `ap-southeast-1` (Isolated from `tools-sakti`).
-- **Vercel Team**: `team_rJcdVvmqpKTfIFC5UGcIaLQR` (Project: `socilift-saas`).
-- **Super Admin Login**: `rickyrizkymnf123@gmail.com` / `Permatasari11` (Enterprise Lifetime).
+## Approval System & Admin ACC Management ala ProfitLab (06 Okt 2026)
+- **Approval Workflow**:
+  - Semua pengguna yang mendaftar via `/signup` memiliki status default `is_approved: false`.
+  - Percobaan login tanpa ACC diblokir dengan status HTTP 403: *"Sorry, kamu masih belum di-approve, menunggu persetujuan dari admin"*, dan otomatis diarahkan ke `/pending-approval`.
+  - Super Admin (`rickyrizkymnf123@gmail.com`) selalu otomatis disetujui (`is_approved: true`) dengan paket Pro Lifetime.
+- **Halaman Pending Approval (`src/app/(auth)/pending-approval/page.tsx`)**:
+  - Menampilkan badge "Menunggu Persetujuan", info box aktivasi, email terdaftar, tombol 1-klik "Hubungi Admin via WhatsApp", dan tombol logout.
+- **Admin ACC Suite (`src/app/(app)/admin/users/page.tsx`)**:
+  - Konfigurasi nomor WhatsApp admin yang dapat disimpan (`admin_whatsapp`).
+  - Filter & card statistik khusus "Menunggu ACC".
+  - Tombol **[ACC]** 1-klik pada setiap baris user yang belum disetujui.
+  - Tombol **[ACC Terpilih]** pada floating bar untuk persetujuan massal.
+- **Tier Paket & Multi-tenant**:
+  - Paket langganan disederhanakan menjadi **Basic** dan **Pro**.
+  - Isolasi data 100% per-user untuk workspace, brand, dan riwayat chat AI.
 
 

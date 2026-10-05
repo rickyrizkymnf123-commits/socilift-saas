@@ -33,6 +33,8 @@ import {
 } from '@/types/database';
 import { useAuth } from '@/lib/auth/auth-context';
 
+import { useRouter } from 'next/navigation';
+
 interface AdminStats {
   total: number;
   active: number;
@@ -43,7 +45,8 @@ interface AdminStats {
 }
 
 export default function AdminUsersPage() {
-  const { startImpersonation } = useAuth();
+  const router = useRouter();
+  const { user, startImpersonation } = useAuth();
   const [users, setUsers] = useState<UserAdminListItem[]>([]);
   const [stats, setStats] = useState<AdminStats>({
     total: 0,
@@ -58,6 +61,12 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [tierFilter, setTierFilter] = useState<string>('all');
+
+  useEffect(() => {
+    if (user && user.email?.toLowerCase() !== 'rickyrizkymnf123@gmail.com') {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
   
   // WhatsApp Settings
   const [adminWhatsapp, setAdminWhatsapp] = useState('');

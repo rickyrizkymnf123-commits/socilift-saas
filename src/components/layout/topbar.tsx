@@ -12,7 +12,7 @@ export default function Topbar({ onOpenNewContent }: { onOpenNewContent?: () => 
   const [unreadCount, setUnreadCount] = useState(1);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const canInspect = originalRole === 'dashboard_admin' || user?.email === 'rickyrizkymnf123@gmail.com' || isImpersonating;
+  const canInspect = user?.email?.toLowerCase() === 'rickyrizkymnf123@gmail.com';
 
   useEffect(() => {
     fetch(`/api/notifications?userId=${user?.id || ''}`)
