@@ -79,8 +79,9 @@
   - Filter & card statistik khusus "Menunggu ACC".
   - Tombol **[ACC]** 1-klik pada setiap baris user yang belum disetujui.
   - Tombol **[ACC Terpilih]** pada floating bar untuk persetujuan massal.
-- **Tier Paket & Multi-tenant**:
-  - Paket langganan disederhanakan menjadi **Basic** dan **Pro**.
-  - Isolasi data 100% per-user untuk workspace, brand, dan riwayat chat AI.
+- **Admin Mode & Hak Akses Strict Isolation**:
+  - Menu admin "Kelola Langganan" (`/admin/users`), "Mode Intip Pengguna", dan "Pusat Simulasi" hanya muncul jika login sebagai Super Admin (`rickyrizkymnf123@gmail.com`).
+  - Halaman login murni bersih tanpa tombol quick demo.
+  - Halaman `/admin/users` dilindungi guard yang otomatis me-redirect user biasa ke `/dashboard`.
 
 

@@ -264,8 +264,15 @@
       - Filter cepat dan kartu statistik khusus **"Menunggu ACC"** dengan indikator jumlah user yang menunggu persetujuan.
       - Tombol **[ACC]** (Checkmark hijau) pada setiap baris user yang belum disetujui untuk mengaktifkan akun dalam 1 klik.
       - Tombol **[ACC Terpilih]** pada floating bar untuk menyetujui banyak user sekaligus (Bulk ACC).
+32. **Pembersihan Quick Login Demo & Penguncian Hak Akses Admin (06 Oktober 2026)**:
+    - **Pembersihan Halaman Login (`/login`)**:
+      - Menghapus seluruh bagian "QUICK LOGIN DEMO" (tombol Admin Ricky & Creator Pro).
+      - Mengosongkan form awal (`email: ''`, `password: ''`) agar halaman login bersih dan mandiri.
+    - **Penguncian Total Mode Admin**:
+      - Menu "Kelola Langganan" (`/admin/users`) dan "Mode Intip Pengguna" terkunci secara ketat dan hanya muncul jika login sebagai Super Admin (`rickyrizkymnf123@gmail.com`).
+      - Menghapus opsi dropdown test role switchers pada area profile footer.
+      - Halaman `/admin/users` dilindungi dengan redirect otomatis ke `/dashboard` bagi pengguna non-admin.
     - **Verifikasi & Sinkronisasi Produksi**:
-      - `npx tsc --noEmit` lolos 0 errors.
-      - `npm run build` sukses mengompilasi seluruh rute statis & dinamis.
-      - Git commit `cee2665` dipush ke branch `main`.
-      - Terdeploy ke Vercel dan aktif di domain live `https://socilift-saas.vercel.app`.
+      - `npx tsc --noEmit` & `npm run build` lulus 0 errors.
+      - Git commit `9716027` dipush ke branch `main`.
+      - Terdeploy dan live di `https://socilift-saas.vercel.app`.
